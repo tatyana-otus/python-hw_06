@@ -1,0 +1,27 @@
+
+<div class="col align-self-center">
+    <a href="{% url 'qa:questions' %}"><h1>Hasker</h1></a>
+</div> 
+<div class="col align-self-center">
+    <form id="searchform" action="{% url 'users:logout' %}" method="get" accept-charset="utf-8">
+      <input class="searchfield" id="searchbox" type="text" placeholder="Search ...">
+    </form>
+</div>
+<div class="col align-self-center text-right pull-right"> 
+    {% if user.is_authenticated %}
+        <div class="pull-right">
+            <a href="{% url 'users:settings' %}">{{ user.username }}</a>  
+        </div>
+        <div class="pull-right">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" width="60" alt="Oops ..." />   
+            {% endif %}
+        </div> 
+        <div class="pull-right">
+            <p><a href="{% url 'users:logout' %}">logout</a></p>
+        </div>    
+    {% else %}
+        <a href="{% url 'users:login' %}">login</a> |
+        <a href="{% url 'users:signup' %}">signup</a>
+    {% endif %}
+</div>

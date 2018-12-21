@@ -1,0 +1,40 @@
+<!-- templates/home.html --> 
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row border-between justify-content-center">
+        <h2><a href="{% url 'qa:questions' %}">New questions </a></h2>
+        <h2>&nbsp;|&nbsp;</h2>
+        <h2><a href="{% url 'qa:questions' %}"> Hot questions</a></h2>
+    </div>
+<hr> 
+{% if question_list %}   
+    {% for question in question_list %}
+        {% include "qa/show_question.html" %}    
+    {% endfor %}
+{% else %}
+        <div class="row justify-content-center">
+            <h2>No questions are available</h2>
+        </div>
+{% endif %}
+</div>
+{% endblock %}
+
+
+{% block pagination %}
+  {% if is_paginated %}
+    <div class="container">
+        <div class="row justify-content-center">
+            {% if page_obj.has_previous %}
+              <a href="{% url 'qa:questions' %}?page={{ page_obj.previous_page_number }}">prev</a>
+            {% endif %}
+              <p>&nbsp;{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}&nbsp;</p>
+            {% if page_obj.has_next %}
+              <a href="{% url 'qa:questions' %}?page={{ page_obj.next_page_number }}">next</a>
+            {% endif %}
+        </div>    
+    </div> 
+  {% endif %}
+{% endblock %}
