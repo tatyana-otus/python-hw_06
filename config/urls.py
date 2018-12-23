@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, reverse_lazy
 from django.contrib.staticfiles.urls import static
 from django.views.generic.base import RedirectView
 
@@ -22,7 +22,8 @@ from .settings import settings
 
 
 urlpatterns = [
-    path('', include('hasker.qa.urls')),
+    path('', RedirectView.as_view(url=reverse_lazy('qa:questions'), permanent=True)),
+    path('questions/', include('hasker.qa.urls')),
     path('admin/', admin.site.urls),
     path('users/', include('hasker.users.urls')),
 

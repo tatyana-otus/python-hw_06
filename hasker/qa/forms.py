@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django import forms
 
-from .models import Question, Tag
+from .models import Question, Tag, Answer
 
 
 class QChangeForm(forms.ModelForm):
@@ -25,7 +25,8 @@ class QChangeForm(forms.ModelForm):
     field_order = ['title', 'body', 'form_tags']
 
     def clean_form_tags(self):
-        tags = self.cleaned_data['form_tags'].split(",")
+        tags = [t.strip() for t in self.cleaned_data['form_tags'].split(",")]
+        tags = [t for t in tags if t]
         max_tag_length = Tag._meta.get_field('name').max_length
         if len(tags) > Question.TAGS_NUM:
             raise forms.ValidationError(('Number of tags must be less than: %(len)s'),
@@ -43,3 +44,21 @@ class QChangeForm(forms.ModelForm):
     def save(self, commit = True): 
         question = super().save(commit = False)
         question.save_new_question(self.user, self.cleaned_data['form_tags'])
+
+
+class AddAnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = ['body']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['body'].label = ""   
+
+    header_title = "Your answer"
+    submit_title = "Submit"   
+
+    def save(self, author, question_pk, commit = True): 
+        answer = super().save(commit = False)
+        answer.save_new_answer(author, question_pk, self.cleaned_data['body'])
+        

@@ -1,0 +1,13 @@
+{% if is_paginated %}
+    <div class="container">
+        <div class="row justify-content-center">
+            {% if page_obj.has_previous %}
+              <a class="reload_content" href="{{ base_url }}?page={{ page_obj.previous_page_number }}">prev</a>
+            {% endif %}
+              <p>&nbsp;{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}&nbsp;</p>
+            {% if page_obj.has_next %}
+              <a class="reload_content" href="{{ base_url }}?page={{ page_obj.next_page_number }}">next</a>
+            {% endif %}
+        </div>    
+    </div> 
+{% endif %} 

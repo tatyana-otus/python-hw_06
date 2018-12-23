@@ -12,14 +12,20 @@ class QA(models.Model):
     date = models.DateTimeField()
 
     class Meta:
-        abstract = True
+        abstract = True 
+
+    def show_likes(self):
+        return str(self.u_likes.count())
+
+    def show_dislikes(self):
+        return str(self.u_dislikes.count())     
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=32, unique=True) 
 
     def get_absolute_url(self):
-        return reverse('qa:tag', args=[str(self.id)])
+        return reverse('qa:tag', args=[self.id])
 
 
 class Answer(QA):
@@ -30,6 +36,15 @@ class Answer(QA):
                                         related_name='answer_dislikes_set',
                                         blank=True)
     right = models.BooleanField(default=False)
+
+
+    def save_new_answer(self, author, question_pk, body):
+        self.date = datetime.now();
+        self.author = author
+        self.save()
+        q = Question.objects.get(pk=question_pk)
+        q.answers.add(self)
+
 
 
 class Question(QA):
@@ -45,17 +60,17 @@ class Question(QA):
                                         related_name='question_dislikes_set',
                                         blank=True)
 
-    def votes(self):
-        return self.u_likes__count - self.u_dislikes__count;
-
     def show_tags(self):
-        return " ".join(t.name for t in self.tags.all())
+        return " ".join(t.name for t in self.tags.all())   
 
     def get_tags(self):
         return self.tags.all()  
 
     def get_absolute_url(self):
-        return reverse('qa:detail', args=[str(self.id)])
+        return reverse('qa:detail', args=[self.id])
+
+    def get_absolute_answers_url(self):
+        return reverse('qa:answers', args=[self.id])
 
     def hours_ago(self):
         delta = datetime.now(pytz.timezone(settings.TIME_ZONE)) - self.date
