@@ -10,19 +10,37 @@ class QA(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.CASCADE)
     date = models.DateTimeField()
+    title = None
 
     class Meta:
-        abstract = True 
+        abstract = True
+
+    def get_tags(self):
+        return None
 
     def show_likes(self):
         return str(self.u_likes.count())
 
     def show_dislikes(self):
-        return str(self.u_dislikes.count())     
+        return str(self.u_dislikes.count())
+
+    def hate_this(self, user, hate = True):
+        if hate:
+            if user not in self.u_dislikes.all():
+                self.u_dislikes.add(user)
+                self.u_likes.remove(user)
+            else:
+                raise ValueError("Already voted")
+        else:
+            if user not in self.u_likes.all():
+                self.u_likes.add(user)
+                self.u_dislikes.remove(user)
+            else:
+                raise ValueError("Already voted")
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=32, unique=True) 
+    name = models.CharField(max_length=32, unique=True)
 
     def get_absolute_url(self):
         return reverse('qa:tag', args=[self.id])
@@ -46,7 +64,6 @@ class Answer(QA):
         q.answers.add(self)
 
 
-
 class Question(QA):
     TAGS_NUM = 3
 
@@ -61,10 +78,10 @@ class Question(QA):
                                         blank=True)
 
     def show_tags(self):
-        return " ".join(t.name for t in self.tags.all())   
+        return " ".join(t.name for t in self.tags.all())
 
     def get_tags(self):
-        return self.tags.all()  
+        return self.tags.all()
 
     def get_absolute_url(self):
         return reverse('qa:detail', args=[self.id])
@@ -84,5 +101,4 @@ class Question(QA):
             tag, created = Tag.objects.get_or_create(name=t)
             if created:
                 tag.save()
-            self.tags.add(tag)    
- 
+            self.tags.add(tag)

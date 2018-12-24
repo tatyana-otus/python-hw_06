@@ -2,7 +2,7 @@
     <div class="container">
     {% if items %} 
         {% for item in items %}
-            {% include "qa/show_answer.html" %}
+            {% include "qa/qa_item.html" with qa_type="answer" %}
         {% endfor %}
     {% else %}
             <div class="row justify-content-center">

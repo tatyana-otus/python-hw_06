@@ -27,7 +27,34 @@
   </main>
 
 <script>
-$( "#trending" ).load( "/questions/trending" );
+    $( "#trending" ).load( "/questions/trending" );
+</script>
+
+<script>
+        $('body').on('click', '.votingButton', function(){
+
+        var item_id    = $(this).attr('item_id');
+        var item_value = $(this).attr('item_value');
+        var item_type  = $(this).attr('item_type');
+
+        console.log(item_id, item_value, item_type)
+
+        req = $.ajax({
+            url:  'update',
+            type: 'POST',
+            data: {id: item_id, value: item_value, type: item_type,
+            csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+        req.done(function(data){
+            uniq_id = "#"+item_type+"_"+item_id
+            if (data.status == 'OK'){
+                if (item_value == 'love')      delta =  1
+                else if (item_value == 'hate') delta = -1
+                $(uniq_id).text(parseInt($(uniq_id).text()) + delta);
+            }
+        })
+        return false;
+    });
 </script>
 
 </body>

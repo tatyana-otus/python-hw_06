@@ -3,45 +3,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-    <div class="col col-lg-2 align-self-center">
-        <div class="row">
-            <a type="button" class="btn btn-success btn-sm" href="">love</a>
-        </div>
-        <div class="row">
-            <h2>{{ question.votes }}</h2>
-        </div> 
-        <div class="row">
-            <a type="button" class="btn btn-danger btn-sm" href="">hate</a>
-        </div>   
-    </div>    
-    <div class="col">
-        <div class="row justify-content-center">
-            <h2>{{ question.title }}<h2>
-        </div>
-        <div class="row">
-            {{ question.body }}
-        </div>    
-        <div class="row">
-            <div class="col justify-content-left">
-                <div class="btn-toolbar">
-                {% for tag in question.get_tags %}
-                    <a type="button" class="btn btn-primary btn-sm mr-1" href="{{ tag.get_absolute_url }}">{{ tag.name }}</a>
-                {% endfor %} 
-                </div>
-            </div> 
-            <div class="col text-right">
-                {% if question.author.avatar %}
-                    <img src="{{ question.author.avatar.url }}" width="60" alt="Oops ..." />
-                {% endif %}
-                {{ question.author }} 
-            </div>  
-        </div>  
-    </div>
-    </div>
 
-    <hr>
+<div class="container">
+    {% include "qa/qa_item.html" with item=question qa_type="question" %}
     <div class="row">
         <div class="container" id ="answers">
             <script>
@@ -49,7 +13,7 @@
             </script>
         </div>
     </div>
-{% if user.is_authenticated %}    
+{% if user.is_authenticated %}
     <div class="row">
         <h3>Your answer</h3>
     </div> 
@@ -59,7 +23,8 @@
             {{ form }}
             <p><input type="submit" class="btn btn-primary" value=Submit /></p>
         </form>
-    </div> 
-{% endif %}  
+    </div>
+{% endif %}
 </div>
+
 {% endblock %}
