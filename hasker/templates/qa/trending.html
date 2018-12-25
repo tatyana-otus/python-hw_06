@@ -2,16 +2,16 @@
     <div class="row justify-content-center">
         <h2>Trending</h2>
     </div>
-    {% if question_list %}   
+    {% if question_list %}
         {% for question in question_list %}
         <div class="row">
             <div class="col">
                 {{ question.votes }}
             </div>
             <div class="col">
-                <a href="{{ question.get_absolute_url }}">{{ question.title }}</a>  
+                <a href="{{ question.get_absolute_url }}">{{ question.title }}</a>
             </div>
-        </div>    
+        </div>
         {% endfor %}
     {% else %}
         <div>No questions</div>

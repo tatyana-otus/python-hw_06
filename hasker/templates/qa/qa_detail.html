@@ -1,4 +1,4 @@
-<!-- templates/home.html -->
+<!-- templates/qa/qa_detail.html -->
 
 {% extends 'base.html' %}
 
@@ -8,11 +8,20 @@
     {% include "qa/qa_item.html" with item=question qa_type="question" %}
     <div class="row">
         <div class="container" id ="answers">
-            <script>
-                $( "#answers" ).load( "{{ question.get_absolute_answers_url }}" );
-            </script>
+            {% if items %} 
+                {% for item in items %}
+                    {% include "qa/qa_item.html" with qa_type="answer" %}
+                {% endfor %}
+            {% else %}
+                <div class="row justify-content-center">
+                    <h2>No answers are available</h2>
+                </div>
+            {% endif %}
         </div>
     </div>
+    <div class="row">
+        {% include "qa/pagination.html" %}
+    </div> 
 {% if user.is_authenticated %}
     <div class="row">
         <h3>Your answer</h3>

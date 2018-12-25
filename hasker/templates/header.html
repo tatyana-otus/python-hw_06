@@ -3,23 +3,27 @@
     <a href="{% url 'qa:questions' %}"><h1>Hasker</h1></a>
 </div> 
 <div class="col align-self-center">
-    <form id="searchform" action="{% url 'users:logout' %}" method="get" accept-charset="utf-8">
-      <input class="searchfield" id="searchbox" type="text" placeholder="Search ...">
+    <form id="searchform" action="{% url 'qa:questions' %}" method="get" accept-charset="utf-8">
+    {% if 'find' in request.GET %}
+        <input required class="searchfield" id="searchbox" name="find" value="{{ request.GET.find }}" type="text" placeholder="Search ...">
+    {% else %}
+        <input required class="searchfield" id="searchbox" name="find" value="" type="text" placeholder="Search ...">
+    {% endif %}
     </form>
 </div>
-<div class="col align-self-center text-right pull-right"> 
+<div class="col align-self-center text-right pull-right">
     {% if user.is_authenticated %}
         <div class="pull-right">
-            <a href="{% url 'users:settings' %}">{{ user.username }}</a>  
+            <a href="{% url 'users:settings' %}">{{ user.username }}</a>
         </div>
         <div class="pull-right">
             {% if user.avatar %}
-                <img src="{{ user.avatar.url }}" width="60" alt="Oops ..." />   
+                <img src="{{ user.avatar.url }}" width="60" alt="Oops ..." />
             {% endif %}
-        </div> 
+        </div>
         <div class="pull-right">
             <p><a href="{% url 'users:logout' %}">logout</a></p>
-        </div>    
+        </div>
     {% else %}
         <a href="{% url 'users:login' %}">login</a> |
         <a href="{% url 'users:signup' %}">signup</a>

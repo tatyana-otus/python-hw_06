@@ -15,12 +15,21 @@ TRENDING_NUM = 20
 QUESTION_PAGINATE = 4
 ANSWER_PAGINATE = 2
 
-class IndexView(generic.ListView):
+class IndexView(generic.ListView): # GET param 'tab' + 'page' !!!
     template_name = 'home.html'
     context_object_name = 'question_list'
     paginate_by = QUESTION_PAGINATE
-    sort = {'new': '-date', 'hot': 'votes'}
+    sort = {'new': ['-date', '-votes'], 'hot': ['-votes', '-date']}
     default_sort = 'new'
+
+
+    def set_sort(self, queryset):
+        value = self.request.GET.get('tab', self.default_sort)
+        return queryset.order_by(*self.sort[value])
+
+    def set_filter(self, queryset):
+        return queryset
+
 
     def get_queryset(self):
         value = self.request.GET.get('tab', self.default_sort)
@@ -30,8 +39,8 @@ class IndexView(generic.ListView):
                         .annotate(Count('answers', distinct=True),\
                                   Count('u_likes', distinct=True),\
                                   Count('u_dislikes', distinct=True))\
-                        .annotate(votes=F('u_likes__count')-F('u_dislikes__count'))\
-                        .order_by(self.sort[value])
+                        .annotate(votes=F('u_likes__count') - F('u_dislikes__count'))\
+                        .order_by(*self.sort[value])
 
 
 class AddQuestionView(generic.View):
@@ -55,48 +64,22 @@ class TrendingView(generic.ListView):
     context_object_name = 'question_list'
 
     def get_queryset(self):
-        return Question.objects.order_by('-date')\
+        return Question.objects.order_by('-votes', '-date')\
                        .annotate(Count('u_likes', distinct=True),
                                  Count('u_dislikes', distinct=True))\
                        .annotate(votes=F('u_likes__count') -\
                                        F('u_dislikes__count'))[:TRENDING_NUM]
 
 
-class QuestionDetailView(generic.View):
-    template_name = 'qa/question_detail.html'
-
-    def get(self, request, *args, **kwargs):
-        form = AddAnswerForm()
-        queryset = Question.objects\
-                           .annotate(Count('u_likes', distinct=True),
-                                     Count('u_dislikes', distinct=True))\
-                           .annotate(votes=F('u_likes__count') -\
-                                           F('u_dislikes__count'))
-        question = get_object_or_404(queryset, pk=kwargs['pk'])
-        return render(request, self.template_name, {'question': question, 'form': form})
-  
-    def post(self, request, *args, **kwargs): 
-        if not request.user.is_authenticated:
-            return redirect(reverse('user:login'))
-        question_pk = kwargs.get('pk') 
-        form = AddAnswerForm(request.POST)
-        if form.is_valid():
-            form.save(request.user, question_pk)
-            return redirect(reverse('qa:detail', args=[question_pk]))
-        question = get_object_or_404(Question, pk=question_pk)  # !!!!  
-        return render(request, self.template_name,  {'question': question, 'form': form})
-
-
-class AnswerView(generic.ListView):
-    template_name = 'qa/answers_list.html'
-    context_object_name = 'items' 
+class QA_DetailView(generic.ListView):
+    template_name = 'qa/qa_detail.html'
+    context_object_name = 'items'
     paginate_by = ANSWER_PAGINATE
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        question_pk = self.kwargs.get('pk')
-        context['question'] = Question.objects.get(pk=question_pk)
-        return context
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.answer_form = AddAnswerForm()
+
 
     def get_queryset(self):
         question_pk = self.kwargs.get('pk')
@@ -108,6 +91,36 @@ class AnswerView(generic.ListView):
                                 F('u_dislikes__count'))\
                 .order_by('-date')\
                 .select_related('author')
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        question_pk = self.kwargs.get('pk')
+
+        context['question'] = Question.objects\
+                                      .annotate(Count('u_likes', distinct=True),
+                                                 Count('u_dislikes', distinct=True))\
+                                      .annotate(votes=F('u_likes__count') -\
+                                                       F('u_dislikes__count'))\
+                                      .get(pk=question_pk)
+        context['form'] = self.answer_form
+        return context
+
+
+    def get(self, request, *args, **kwargs):
+        self.answer_form = AddAnswerForm()
+        return super().get(request, *args, **kwargs)
+
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect(reverse('user:login'))
+        question_pk = kwargs.get('pk')
+        form = AddAnswerForm(request.POST)
+        if form.is_valid():
+            form.save(request.user, question_pk)
+            return redirect(reverse('qa:detail', args=[question_pk]))
+        return super().get(request, *args, **kwargs)
 
 
 @require_http_methods(["POST"])

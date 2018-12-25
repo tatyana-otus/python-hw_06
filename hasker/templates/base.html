@@ -40,7 +40,7 @@
         console.log(item_id, item_value, item_type)
 
         req = $.ajax({
-            url:  'update',
+            url:  $(this).attr('href'),
             type: 'POST',
             data: {id: item_id, value: item_value, type: item_type,
             csrfmiddlewaretoken: '{{ csrf_token }}' }

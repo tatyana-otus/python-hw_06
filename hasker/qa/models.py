@@ -86,12 +86,8 @@ class Question(QA):
     def get_absolute_url(self):
         return reverse('qa:detail', args=[self.id])
 
-    def get_absolute_answers_url(self):
-        return reverse('qa:answers', args=[self.id])
-
-    def hours_ago(self):
-        delta = datetime.now(pytz.timezone(settings.TIME_ZONE)) - self.date
-        return str(delta.total_seconds() // 3600)
+    # def get_absolute_answers_url(self):
+    #     return reverse('qa:answers', args=[self.id])
 
     def save_new_question(self, author, tag_list):
         self.date = datetime.now();

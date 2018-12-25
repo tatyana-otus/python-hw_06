@@ -53,7 +53,6 @@ class ProfileChangeForm(ModelForm):
         self.fields['username'].label = "Login"
         self.fields['email'].label = "Emai"
         self.fields['avatar'].label = "Avatar"
-
         self.fields['username'].disabled = True
         self.fields['username'].help_text = "" 
     

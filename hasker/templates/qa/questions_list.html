@@ -1,8 +1,8 @@
 <div class="row">
     <div class="container">
-    {% if question_list %}   
+    {% if question_list %}
         {% for question in question_list %}
-            {% include "qa/show_question.html" %}    
+            {% include "qa/show_question.html" %}
         {% endfor %}
     {% else %}
             <div class="row justify-content-center">
@@ -12,6 +12,6 @@
     </div>
 </div>
 <div class="row">
-    {% url 'qa:detail' as abs_url %}
-    {% include "qa/pagination.html" with base_url=abs_url %}   
+<!--     {% url 'qa:detail' as abs_url %} -->
+    {% include "qa/pagination.html" %}
 </div>

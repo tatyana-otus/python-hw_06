@@ -3,15 +3,15 @@
 <div class="row">
     <div class="col col-lg-2 align-self-center">
         <div class="row">
-            <a type="button" class="votingButton btn btn-success btn-sm" item_id="{{ item.id }}"item_value = "love" item_type = "{{ qa_type }}" href="">love</a>
+            <a type="button" class="votingButton btn btn-success btn-sm" item_id="{{ item.id }}"item_value = "love" item_type = "{{ qa_type }}" href="{% url 'qa:update' %}">love</a>
         </div>
         <div class="row">
             <h2 id="{{ qa_type }}_{{ item.id }}">{{ item.votes }}</h2>
-        </div> 
+        </div>
         <div class="row">
-            <a type="button" class="votingButton btn btn-danger btn-sm" item_id="{{ item.id }}" item_value = "hate" item_type = "{{ qa_type }}" href="">hate</a>
-        </div> 
-    </div> 
+            <a type="button" class="votingButton btn btn-danger btn-sm" item_id="{{ item.id }}" item_value = "hate" item_type = "{{ qa_type }}" href="{% url 'qa:update' %}">hate</a>
+        </div>
+    </div>
     <div class="col">
         {% if item.title %}
         <div class="row justify-content-center">
@@ -20,7 +20,7 @@
         {% endif %}
         <div class="row">
             {{ item.body }}
-        </div> 
+        </div>
         <div class="row">
             {% if item.get_tags %}
             <div class="col col text-right">
@@ -35,7 +35,7 @@
             {% endif %}
             {{ item.author }}
         </div>
-        </div> 
-    </div>  
-</div> 
+        </div>
+    </div>
+</div>
 <hr>
