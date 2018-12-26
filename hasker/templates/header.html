@@ -3,7 +3,7 @@
     <a href="{% url 'qa:questions' %}"><h1>Hasker</h1></a>
 </div> 
 <div class="col align-self-center">
-    <form id="searchform" action="{% url 'qa:questions' %}" method="get" accept-charset="utf-8">
+    <form id="searchform" action="{% url 'qa:search' %}" method="get" accept-charset="utf-8">
     {% if 'find' in request.GET %}
         <input required class="searchfield" id="searchbox" name="find" value="{{ request.GET.find }}" type="text" placeholder="Search ...">
     {% else %}

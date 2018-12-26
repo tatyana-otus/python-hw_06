@@ -4,11 +4,15 @@
 
 {% block content %}
 <div class="container">
-    <div class="row border-between justify-content-center">
-        <h2><a href="{% url 'qa:questions' %}?tab=new">New questions </a></h2>
-        <h2>&nbsp;|&nbsp;</h2>
-        <h2><a href="{% url 'qa:questions' %}?tab=hot"> Hot questions</a></h2>
-    </div>
+    {% if title %}
+        <h2>{{ title }}</h2>
+    {% else %}
+        <div class="row border-between justify-content-center">
+            <h2><a href="{% url 'qa:questions' %}?tab=new">New questions </a></h2>
+            <h2>&nbsp;|&nbsp;</h2>
+            <h2><a href="{% url 'qa:questions' %}?tab=hot"> Hot questions</a></h2>
+        </div>
+    {% endif %}
 <hr>
 {% include "qa/questions_list.html" %}
 </div>

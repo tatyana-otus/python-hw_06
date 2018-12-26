@@ -1,10 +1,9 @@
+from django import forms
 from django.http import HttpResponse
 from django.views import generic
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.db.models import Count
-from django.db.models import F
-from django import forms
+from django.db.models import Count, F, Q
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 
@@ -15,13 +14,14 @@ TRENDING_NUM = 20
 QUESTION_PAGINATE = 4
 ANSWER_PAGINATE = 2
 
-class IndexView(generic.ListView): # GET param 'tab' + 'page' !!!
+
+class IndexView(generic.ListView):
     template_name = 'home.html'
-    context_object_name = 'question_list'
     paginate_by = QUESTION_PAGINATE
+    context_object_name = 'question_list'
     sort = {'new': ['-date', '-votes'], 'hot': ['-votes', '-date']}
     default_sort = 'new'
-
+    title = ""
 
     def set_sort(self, queryset):
         value = self.request.GET.get('tab', self.default_sort)
@@ -30,17 +30,47 @@ class IndexView(generic.ListView): # GET param 'tab' + 'page' !!!
     def set_filter(self, queryset):
         return queryset
 
-
-    def get_queryset(self):
-        value = self.request.GET.get('tab', self.default_sort)
+    def build_queryset(self):
         return  Question.objects\
                         .prefetch_related('tags')\
                         .select_related('author')\
                         .annotate(Count('answers', distinct=True),\
                                   Count('u_likes', distinct=True),\
                                   Count('u_dislikes', distinct=True))\
-                        .annotate(votes=F('u_likes__count') - F('u_dislikes__count'))\
-                        .order_by(*self.sort[value])
+                        .annotate(votes=F('u_likes__count') - F('u_dislikes__count'))
+
+    def get_queryset(self):
+        qs = self.build_queryset()
+        qs = self.set_filter(qs)
+        qs = self.set_sort(qs)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.title
+        return context
+
+
+class SearchView(IndexView):
+    default_sort = 'hot'
+    title = "Search result"
+
+    def set_filter(self, queryset):
+        value = self.request.GET.get('find', "")
+        if value:
+            queryset = queryset.filter(Q(title__contains=value) |
+                                       Q(body__contains=value))
+        return queryset
+
+
+class TaggedView(IndexView):
+    default_sort = 'hot'
+    title = "Tag result"
+
+    def set_filter(self, queryset):
+        tag_pk = self.kwargs.get('pk')
+        queryset = queryset.filter(tags__id=tag_pk)
+        return queryset
 
 
 class AddQuestionView(generic.View):
@@ -142,7 +172,3 @@ def update_votes(request):
     except Exception as e:
         return JsonResponse({'status': 'FAIL'})
     return JsonResponse({'status': 'OK'})
-
-
-class QuestionsByTagView(generic.ListView):
-    pass
