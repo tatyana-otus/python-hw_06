@@ -14,4 +14,7 @@ urlpatterns = [
     path('<int:pk>/', views.QA_DetailView.as_view(), name='detail'),
     path('tags/<int:pk>/', views.TaggedView.as_view(), name='tag'),
     path('trending', views.TrendingView.as_view(), name='trending'),
+
+    path('accept', login_required(views.accept_answer,
+                                 login_url='users:login'), name='accept'),
 ]

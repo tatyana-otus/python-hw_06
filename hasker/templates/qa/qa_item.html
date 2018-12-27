@@ -11,6 +11,21 @@
         <div class="row">
             <a type="button" class="votingButton btn btn-danger btn-sm" item_id="{{ item.id }}" item_value = "hate" item_type = "{{ qa_type }}" href="{% url 'qa:update' %}">hate</a>
         </div>
+        {% if qa_type == "answer" %}
+        <div class="row">
+            {% if user == item.author %}
+                {% if item.accepted %}
+                    <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accepted !</a>
+                {% else %}
+                    <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accept</a>
+                {% endif %}
+            {% else %}
+                {% if item.accepted %}
+                    accepted
+                {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
     </div>
     <div class="col">
         {% if item.title %}

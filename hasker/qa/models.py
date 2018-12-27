@@ -26,17 +26,17 @@ class QA(models.Model):
 
     def hate_this(self, user, hate = True):
         if hate:
-            if user not in self.u_dislikes.all():
-                self.u_dislikes.add(user)
-                self.u_likes.remove(user)
-            else:
-                raise ValueError("Already voted")
-        else:
-            if user not in self.u_likes.all():
-                self.u_likes.add(user)
+            self.u_likes.remove(user)
+            if user  in self.u_dislikes.all():
                 self.u_dislikes.remove(user)
             else:
-                raise ValueError("Already voted")
+                self.u_dislikes.add(user)
+        else:
+            self.u_dislikes.remove(user)
+            if user in self.u_likes.all():
+                self.u_likes.remove(user)
+            else:
+                self.u_likes.add(user)
 
 
 class Tag(models.Model):
@@ -53,15 +53,20 @@ class Answer(QA):
     u_dislikes = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                         related_name='answer_dislikes_set',
                                         blank=True)
-    right = models.BooleanField(default=False)
+    accepted = models.BooleanField(default=False)
+    question = models.ForeignKey('Question', on_delete=models.CASCADE)
 
 
     def save_new_answer(self, author, question_pk, body):
+        q = Question.objects.get(pk=question_pk)
         self.date = datetime.now();
         self.author = author
+        self.question = q
         self.save()
-        q = Question.objects.get(pk=question_pk)
-        q.answers.add(self)
+        q.answers.add(self)   # !!!
+
+    def accept(self, question_author):
+        return True
 
 
 class Question(QA):
@@ -69,7 +74,9 @@ class Question(QA):
 
     title = models.CharField(max_length=255)
     tags = models.ManyToManyField(Tag, blank=True)
-    answers = models.ManyToManyField(Answer, blank=True)
+    answers = models.ManyToManyField(Answer, related_name='question_dislikes_set',
+                                     blank=True)
+
     u_likes = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                      related_name='question_likes_set',
                                      blank=True)

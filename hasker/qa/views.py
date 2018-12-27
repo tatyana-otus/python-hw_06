@@ -171,4 +171,17 @@ def update_votes(request):
             obj.hate_this(request.user, False)
     except Exception as e:
         return JsonResponse({'status': 'FAIL'})
-    return JsonResponse({'status': 'OK'})
+    votes = obj.u_likes.count() - obj.u_dislikes.count();
+    return JsonResponse({'status': 'OK', 'votes': votes})
+
+
+@require_http_methods(["POST"])
+def accept_answer(request):
+    item_id = request.POST.get('id')
+    item_value = request.POST.get('value')
+    try:
+        obj = Answer.objects.get(pk=item_id)
+        result = obj.accept(request.user)
+    except Exception as e:
+        return JsonResponse({'status': 'FAIL'})
+    return JsonResponse({'status': 'OK', "accepted": result})

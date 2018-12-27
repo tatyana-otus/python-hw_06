@@ -32,39 +32,50 @@
 
 <script>
         $('body').on('click', '.votingButton', function(){
+            var item_id    = $(this).attr('item_id');
+            var item_value = $(this).attr('item_value');
+            var item_type  = $(this).attr('item_type');
 
-        var item_id    = $(this).attr('item_id');
-        var item_value = $(this).attr('item_value');
-        var item_type  = $(this).attr('item_type');
+            req = $.ajax({
+                url:  $(this).attr('href'),
+                type: 'POST',
+                data: {id: item_id, value: item_value, type: item_type,
+                csrfmiddlewaretoken: '{{ csrf_token }}' }
+            });
+            req.done(function(data){
+                uniq_id = "#"+item_type+"_"+item_id
+                if (data.status == 'OK'){
+                    $(uniq_id).text(data.votes);
+                }
+            })
+            return false;
+    });
+</script>
 
-        console.log(item_id, item_value, item_type)
+<script>
+        $('body').on('click', '.acceptAnswer', function(){
+            var item_id    = $(this).attr('id');
+            req = $.ajax({
+                url:  $(this).attr('href'),
+                type: 'POST',
+                data: {id: item_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}' }
+            });
 
-        req = $.ajax({
-            url:  $(this).attr('href'),
-            type: 'POST',
-            data: {id: item_id, value: item_value, type: item_type,
-            csrfmiddlewaretoken: '{{ csrf_token }}' }
-        });
-        req.done(function(data){
-            uniq_id = "#"+item_type+"_"+item_id
-            if (data.status == 'OK'){
-                if (item_value == 'love')      delta =  1
-                else if (item_value == 'hate') delta = -1
-                $(uniq_id).text(parseInt($(uniq_id).text()) + delta);
-            }
-        })
+            req.done(function(data){
+                if (data.status == 'OK'){
+                    uniq_id = "#"+item_id
+                    $('.acceptAnswer').addClass("text-muted");
+                    $('.acceptAnswer').text ("accept");
+                    if (data.accepted == true){
+                        $(uniq_id).removeClass("text-muted");
+                        $(uniq_id).text ("accepted !");
+                    }
+                }
+            })
         return false;
     });
 </script>
 
 </body>
-
-
-
-
-
-
-
-
-
 
