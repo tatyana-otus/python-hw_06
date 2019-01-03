@@ -4,11 +4,7 @@
 </div> 
 <div class="col align-self-center">
     <form id="searchform" action="{% url 'qa:search' %}" method="get" accept-charset="utf-8">
-    {% if 'find' in request.GET %}
-        <input required class="searchfield" id="searchbox" name="find" value="{{ request.GET.find }}" type="text" placeholder="Search ...">
-    {% else %}
-        <input required class="searchfield" id="searchbox" name="find" value="" type="text" placeholder="Search ...">
-    {% endif %}
+        <input required class="searchfield" id="searchbox" name="find" value="{% firstof extension.search_string '' %}" type="text" placeholder="Search ...">
     </form>
 </div>
 <div class="col align-self-center text-right pull-right">

@@ -5,6 +5,8 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 
+from hasker.qa.utils.helper import *
+
 class QA(models.Model):
     body = models.TextField()
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -64,6 +66,7 @@ class Answer(QA):
         self.question = q
         self.save()
         q.answers.add(self)   # !!!
+        new_answer_notify(q.author.email, q.get_absolute_url)
 
     def accept(self, question_author):
         return True

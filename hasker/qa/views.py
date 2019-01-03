@@ -7,7 +7,8 @@ from django.db.models import Count, F, Q
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 
-from .models import Question, Answer
+from hasker.qa.utils.helper import *
+from .models import Question, Answer, Tag
 from .forms import QChangeForm, AddAnswerForm
 
 TRENDING_NUM = 20
@@ -21,7 +22,7 @@ class IndexView(generic.ListView):
     context_object_name = 'question_list'
     sort = {'new': ['-date', '-votes'], 'hot': ['-votes', '-date']}
     default_sort = 'new'
-    title = ""
+    context_extension = {'title': "", 'search_string': ""}
 
     def set_sort(self, queryset):
         value = self.request.GET.get('tab', self.default_sort)
@@ -47,28 +48,33 @@ class IndexView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = self.title
+        context['extension'] = self.context_extension
         return context
 
 
 class SearchView(IndexView):
     default_sort = 'hot'
-    title = "Search result"
+    context_extension = {'title': "Search result"}
 
     def set_filter(self, queryset):
-        value = self.request.GET.get('find', "")
-        if value:
-            queryset = queryset.filter(Q(title__contains=value) |
-                                       Q(body__contains=value))
+        search_string = self.request.GET.get('find', "")
+        tag_names, find_value = parse_search_string(search_string)
+        self.context_extension['search_string'] = search_string
+        if find_value:
+            queryset = queryset.filter(Q(title__contains=find_value) |
+                                       Q(body__contains=find_value))
+        queryset = set_filter_by_tag_names(queryset, tag_names)
         return queryset
 
 
 class TaggedView(IndexView):
     default_sort = 'hot'
-    title = "Tag result"
+    context_extension = {'title': "Tag result"}
 
     def set_filter(self, queryset):
         tag_pk = self.kwargs.get('pk')
+        tag = get_object_or_404(Tag, pk=tag_pk)
+        self.context_extension['search_string'] = "tag:{}".format(tag.name)
         queryset = queryset.filter(tags__id=tag_pk)
         return queryset
 
@@ -136,11 +142,9 @@ class QA_DetailView(generic.ListView):
         context['form'] = self.answer_form
         return context
 
-
     def get(self, request, *args, **kwargs):
         self.answer_form = AddAnswerForm()
         return super().get(request, *args, **kwargs)
-
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:

@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="container">
-    {% if title %}
-        <h2>{{ title }}</h2>
+    {% if extension.title %}
+        <h2>{{ extension.title }}</h2>
     {% else %}
         <div class="row border-between justify-content-center">
             <h2><a href="{% url 'qa:questions' %}?tab=new">New questions </a></h2>
