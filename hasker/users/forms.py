@@ -15,8 +15,10 @@ class ProfileCreationForm(UserCreationForm):
 
     header_title = "SignUp"
     submit_title = "SignUp"
+    extension = {}
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.extension = {}
         self.fields['username'].label = "Login"
         self.fields['email'].label = "Emai"
         self.fields['password1'].label = "Password"
@@ -29,8 +31,10 @@ class ProfileCreationForm(UserCreationForm):
 class LoginForm(AuthenticationForm):
     header_title = "Login"
     submit_title = "Login"
+    extension = {}
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.extension = {}
         self.fields['username'].label = "Login"
         self.fields['password'].label = "Password"
 
@@ -44,6 +48,7 @@ class LoginForm(AuthenticationForm):
 class ProfileChangeForm(ModelForm):
     header_title = "Settings"
     submit_title = "Save"
+    extension = {}
     class Meta:
         model = Profile
         fields = ['username', 'email', 'avatar']

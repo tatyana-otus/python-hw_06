@@ -2,19 +2,6 @@ import re
 
 from django.core import mail
 
-# def cases(cases):
-#     def decorator(f):
-#         @functools.wraps(f)
-#         def wrapper(*args):
-#             for c in cases:
-#                 new_args = args + (c if isinstance(c, tuple) else (c,))
-#                 try:
-#                     f(*new_args)
-#                 except AssertionError as e:
-#                     raise AssertionError("{}: {} (test case: {})".format(e, f.__name__, c))
-#         return wrapper
-#     return decorator
-
 def parse_search_string(search_string):
     tag_names = []
     find_value = ""

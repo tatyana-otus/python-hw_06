@@ -22,7 +22,8 @@ class IndexView(generic.ListView):
     context_object_name = 'question_list'
     sort = {'new': ['-date', '-votes'], 'hot': ['-votes', '-date']}
     default_sort = 'new'
-    context_extension = {'title': "", 'search_string': ""}
+    search_string = ""
+    title = ""
 
     def set_sort(self, queryset):
         value = self.request.GET.get('tab', self.default_sort)
@@ -48,18 +49,19 @@ class IndexView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['extension'] = self.context_extension
+        context['search_string'] = self.search_string
+        context['title'] = self.title
         return context
 
 
 class SearchView(IndexView):
     default_sort = 'hot'
-    context_extension = {'title': "Search result"}
+    title = "Search result"
 
     def set_filter(self, queryset):
         search_string = self.request.GET.get('find', "")
         tag_names, find_value = parse_search_string(search_string)
-        self.context_extension['search_string'] = search_string
+        self.search_string = search_string
         if find_value:
             queryset = queryset.filter(Q(title__contains=find_value) |
                                        Q(body__contains=find_value))
@@ -69,12 +71,12 @@ class SearchView(IndexView):
 
 class TaggedView(IndexView):
     default_sort = 'hot'
-    context_extension = {'title': "Tag result"}
+    title = "Tag result"
 
     def set_filter(self, queryset):
         tag_pk = self.kwargs.get('pk')
         tag = get_object_or_404(Tag, pk=tag_pk)
-        self.context_extension['search_string'] = "tag:{}".format(tag.name)
+        self.search_string = "tag:{}".format(tag.name)
         queryset = queryset.filter(tags__id=tag_pk)
         return queryset
 

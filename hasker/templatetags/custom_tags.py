@@ -5,7 +5,7 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def get_param_replace(context, **kwargs):
+def http_get_param_replace(context, **kwargs):
     """
     Return encoded URL parameters that are the same as the current
     request's parameters, only with the specified GET parameters added or changed.
@@ -26,3 +26,8 @@ def get_param_replace(context, **kwargs):
     for k, v in kwargs.items():
         d[k] = v
     return d.urlencode()
+
+
+@register.simple_tag(takes_context=True)
+def get_safe(context, value, default_value):
+    return context.get(value, default_value)

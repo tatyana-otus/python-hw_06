@@ -1,10 +1,11 @@
-
+{% load custom_tags %}
 <div class="col align-self-center">
     <a href="{% url 'qa:questions' %}"><h1>Hasker</h1></a>
 </div> 
 <div class="col align-self-center">
+
     <form id="searchform" action="{% url 'qa:search' %}" method="get" accept-charset="utf-8">
-        <input required class="searchfield" id="searchbox" name="find" value="{% firstof extension.search_string '' %}" type="text" placeholder="Search ...">
+        <input required class="searchfield" id="searchbox" name="find" value="{% get_safe 'search_string' '' %}" type="text" placeholder="Search ...">
     </form>
 </div>
 <div class="col align-self-center text-right pull-right">

@@ -1,7 +1,7 @@
 from datetime import datetime
 import pytz
 
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.urls import reverse
 
@@ -60,13 +60,14 @@ class Answer(QA):
 
 
     def save_new_answer(self, author, question_pk, body):
-        q = Question.objects.get(pk=question_pk)
-        self.date = datetime.now();
-        self.author = author
-        self.question = q
-        self.save()
-        q.answers.add(self)   # !!!
-        new_answer_notify(q.author.email, q.get_absolute_url)
+        with transaction.atomic():
+            q = Question.objects.get(pk=question_pk)
+            self.date = datetime.now();
+            self.author = author
+            self.question = q
+            self.save()
+            q.answers.add(self)   # !!!
+            new_answer_notify(q.author.email, q.get_absolute_url)
 
     def accept(self, question_author):
         return True
@@ -100,11 +101,12 @@ class Question(QA):
     #     return reverse('qa:answers', args=[self.id])
 
     def save_new_question(self, author, tag_list):
-        self.date = datetime.now();
-        self.author = author
-        self.save()
-        for t in tag_list:
-            tag, created = Tag.objects.get_or_create(name=t)
-            if created:
-                tag.save()
-            self.tags.add(tag)
+        with transaction.atomic():
+            self.date = datetime.now();
+            self.author = author
+            self.save()
+            for t in tag_list:
+                tag, created = Tag.objects.get_or_create(name=t)
+                if created:
+                    tag.save()
+                self.tags.add(tag)
