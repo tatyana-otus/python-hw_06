@@ -9,7 +9,7 @@ from django.http import JsonResponse
 
 from hasker.qa.utils.helper import *
 from .models import Question, Answer, Tag
-from .forms import QChangeForm, AddAnswerForm
+from .forms import AddQuestionForm, AddAnswerForm
 
 TRENDING_NUM = 20
 QUESTION_PAGINATE = 4
@@ -83,16 +83,16 @@ class TaggedView(IndexView):
 
 class AddQuestionView(generic.View):
     template_name='users/signup.html',
-    form_class = QChangeForm
+    form_class = AddQuestionForm
     ctx_obj_name = 'form'
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {self.ctx_obj_name: self.form_class})
   
     def post(self, request, *args, **kwargs):
-        form = self.form_class(request.user, request.POST)
+        form = self.form_class(request.POST)
         if form.is_valid():
-            form.save()
+            form.save(request.user)
             return redirect(reverse('qa:questions'))
         return render(request, self.template_name, {self.ctx_obj_name: form})
 
@@ -111,12 +111,13 @@ class TrendingView(generic.ListView):
 
 class QA_DetailView(generic.ListView):
     template_name = 'qa/qa_detail.html'
+    form_class = AddAnswerForm
     context_object_name = 'items'
     paginate_by = ANSWER_PAGINATE
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.answer_form = AddAnswerForm()
+        self.answer_form = self.form_class()
 
 
     def get_queryset(self):
@@ -145,14 +146,14 @@ class QA_DetailView(generic.ListView):
         return context
 
     def get(self, request, *args, **kwargs):
-        self.answer_form = AddAnswerForm()
+        self.answer_form = self.form_class()
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect(reverse('user:login'))
         question_pk = kwargs.get('pk')
-        form = AddAnswerForm(request.POST)
+        form = self.form_class(request.POST)
         if form.is_valid():
             form.save(request.user, question_pk)
             return redirect(reverse('qa:detail', args=[question_pk]))

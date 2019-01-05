@@ -6,7 +6,7 @@ from django import forms
 from .models import Question, Tag, Answer
 
 
-class QChangeForm(forms.ModelForm):
+class AddQuestionForm(forms.ModelForm):
     header_title = "Ask a question"
     submit_title = "Save"
 
@@ -15,17 +15,17 @@ class QChangeForm(forms.ModelForm):
         model = Question
         fields = ['title', 'body']
 
-    def __init__(self, user=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['title'].label = "Title"
         self.fields['body'].label = "Text"
         self.fields['form_tags'].label = "Tags"
-        self.user = user
-    
+
     field_order = ['title', 'body', 'form_tags']
 
     def clean_form_tags(self):
-        tags = [t.strip() for t in self.cleaned_data['form_tags'].split(",")]
+        tags = self.cleaned_data['form_tags'].lower()
+        tags = [t.strip() for t in tags.split(",")]
         tags = [t for t in tags if t]
         max_tag_length = Tag._meta.get_field('name').max_length
         if len(tags) > Question.TAGS_NUM:
@@ -41,9 +41,9 @@ class QChangeForm(forms.ModelForm):
                                             )
         return tags
 
-    def save(self, commit = True): 
+    def save(self, author, commit = True): 
         question = super().save(commit = False)
-        question.save_new_question(self.user, self.cleaned_data['form_tags'])
+        question.save_new_question(author, self.cleaned_data['form_tags'])
 
 
 class AddAnswerForm(forms.ModelForm):
@@ -61,4 +61,3 @@ class AddAnswerForm(forms.ModelForm):
     def save(self, author, question_pk, commit = True): 
         answer = super().save(commit = False)
         answer.save_new_answer(author, question_pk, self.cleaned_data['body'])
-        
