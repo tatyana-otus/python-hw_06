@@ -122,7 +122,8 @@ class QA_DetailView(generic.ListView):
 
     def get_queryset(self):
         question_pk = self.kwargs.get('pk')
-        q = Question.objects.get(pk=question_pk)
+        # q = Question.objects.get(pk=question_pk)
+        q = get_object_or_404(Question, pk=question_pk)
         return q.answers.all()\
                 .annotate(Count('u_likes', distinct=True),\
                           Count('u_dislikes', distinct=True))\
@@ -173,12 +174,11 @@ def update_votes(request):
         else:
             raise ValueError("Wrong update")
         if item_value == "hate":
-            obj.hate_this(request.user)
+            votes = obj.hate_this(request.user)
         elif item_value == "love":
-            obj.hate_this(request.user, False)
+            votes = obj.hate_this(request.user, False)
     except Exception as e:
         return JsonResponse({'status': 'FAIL'})
-    votes = obj.u_likes.count() - obj.u_dislikes.count();
     return JsonResponse({'status': 'OK', 'votes': votes})
 
 

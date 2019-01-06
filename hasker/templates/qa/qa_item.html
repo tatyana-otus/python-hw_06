@@ -13,14 +13,14 @@
         </div>
         {% if qa_type == "answer" %}
         <div class="row">
-            {% if user == item.author %}
-                {% if item.accepted %}
+            {% if user == item.question.author %}
+                {% if item.question.accepted_answer == item %}
                     <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accepted !</a>
                 {% else %}
-                    <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accept</a>
+                    <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accept?</a>
                 {% endif %}
             {% else %}
-                {% if item.accepted %}
+                {% if item.question.accepted_answer == item %}
                     accepted
                 {% endif %}
             {% endif %}
