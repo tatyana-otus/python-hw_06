@@ -22,6 +22,10 @@ MEDIA_ROOT = root('media')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
+TRENDING_NUM = 20
+QUESTION_PAGINATE = 4
+ANSWER_PAGINATE = 2
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 

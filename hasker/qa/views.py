@@ -6,19 +6,16 @@ from django.urls import reverse
 from django.db.models import Count, F, Q
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
+from django.conf import settings
 
 from hasker.qa.utils.helper import *
 from .models import Question, Answer, Tag
 from .forms import AddQuestionForm, AddAnswerForm
 
-TRENDING_NUM = 20
-QUESTION_PAGINATE = 4
-ANSWER_PAGINATE = 2
-
 
 class IndexView(generic.ListView):
     template_name = 'home.html'
-    paginate_by = QUESTION_PAGINATE
+    paginate_by = settings.QUESTION_PAGINATE
     context_object_name = 'question_list'
     sort = {'new': ['-date', '-votes'], 'hot': ['-votes', '-date']}
     default_sort = 'new'
@@ -106,14 +103,14 @@ class TrendingView(generic.ListView):
                        .annotate(Count('u_likes', distinct=True),
                                  Count('u_dislikes', distinct=True))\
                        .annotate(votes=F('u_likes__count') -\
-                                       F('u_dislikes__count'))[:TRENDING_NUM]
+                                       F('u_dislikes__count'))[:settings.TRENDING_NUM]
 
 
 class QA_DetailView(generic.ListView):
     template_name = 'qa/qa_detail.html'
     form_class = AddAnswerForm
     context_object_name = 'items'
-    paginate_by = ANSWER_PAGINATE
+    paginate_by = settings.ANSWER_PAGINATE
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -177,9 +174,12 @@ def update_votes(request):
             votes = obj.hate_this(request.user)
         elif item_value == "love":
             votes = obj.hate_this(request.user, False)
+        else:
+            raise ValueError("Wrong update")
     except Exception as e:
         return JsonResponse({'status': 'FAIL'})
-    return JsonResponse({'status': 'OK', 'votes': votes})
+    return JsonResponse({'status': 'OK', 'votes': votes},
+                        json_dumps_params = {'sort_keys': True})
 
 
 @require_http_methods(["POST"])
@@ -191,4 +191,5 @@ def accept_answer(request):
         result = obj.accept(request.user)
     except Exception as e:
         return JsonResponse({'status': 'FAIL'})
-    return JsonResponse({'status': 'OK', "accepted": result})
+    return JsonResponse({'status': 'OK', "accepted": result},
+                        json_dumps_params = {'sort_keys': True})
