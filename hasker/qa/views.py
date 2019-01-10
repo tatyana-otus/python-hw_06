@@ -119,7 +119,6 @@ class QA_DetailView(generic.ListView):
 
     def get_queryset(self):
         question_pk = self.kwargs.get('pk')
-        # q = Question.objects.get(pk=question_pk)
         q = get_object_or_404(Question, pk=question_pk)
         return q.answers.all()\
                 .annotate(Count('u_likes', distinct=True),\
@@ -160,6 +159,8 @@ class QA_DetailView(generic.ListView):
 
 @require_http_methods(["POST"])
 def update_votes(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'FAIL'})
     item_id = request.POST.get('id')
     item_value = request.POST.get('value')
     item_type = request.POST.get('type')
@@ -184,6 +185,8 @@ def update_votes(request):
 
 @require_http_methods(["POST"])
 def accept_answer(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'status': 'FAIL'})
     item_id = request.POST.get('id')
     item_value = request.POST.get('value')
     try:

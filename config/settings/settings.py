@@ -17,14 +17,19 @@ def root(*dirs):
     return abspath(join(base_dir, *dirs))
 
 BASE_DIR = root()
-STATIC_ROOT = root('static')
+STATIC_ROOT = root('static_root')
 MEDIA_ROOT = root('media')
 MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    root('static'),
+    # '/var/www/static/',
+]
+
 TRENDING_NUM = 20
 QUESTION_PAGINATE = 4
-ANSWER_PAGINATE = 2
+ANSWER_PAGINATE = 4
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/

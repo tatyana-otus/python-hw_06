@@ -27,7 +27,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('hasker.users.urls')),
 
-    path('favicon.ico/', RedirectView.as_view(url='/static/favicon.ico', permanent=True))
+    # path('favicon.ico/', RedirectView.as_view(url='/static/favicon.ico', permanent=True))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -30,7 +30,7 @@ class QA(models.Model):
     def hate_this(self, user, hate = True):
         if hate:
             self.u_likes.remove(user)
-            if user  in self.u_dislikes.all():
+            if user in self.u_dislikes.all():
                 self.u_dislikes.remove(user)
             else:
                 self.u_dislikes.add(user)
@@ -73,8 +73,8 @@ class Answer(QA):
     def accept(self, question_author):
         with transaction.atomic():
             q = self.question
-            if q.author != question_author:
-                raise ValueError("Invalid author")
+            if q.author != question_author or self not in q.answers.all():
+                raise ValueError("Invalid value")
             if q.accepted_answer == self:
                 q.accepted_answer = None
                 q.save()

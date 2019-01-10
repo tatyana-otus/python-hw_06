@@ -86,7 +86,7 @@ class VotingTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.csrf_token = response.context['csrf_token']
 
-    def test_loggin_user_love_hate(self):
+    def test_logged_in_user_voting(self):
         self.assertEqual(self.get_votes(), 0)
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': self.question.id,
@@ -105,7 +105,7 @@ class VotingTest(TestCase):
         self.assertEqual(response.content, b'{"status": "OK", "votes": -1}')
         self.assertEqual(self.get_votes(), -1)
 
-    def test_loggin_user_double_love(self):
+    def test_logged_in_user_double_love(self):
         self.assertEqual(self.get_votes(), 0)
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': self.question.id,
@@ -124,7 +124,7 @@ class VotingTest(TestCase):
         self.assertEqual(response.content, b'{"status": "OK", "votes": 0}')
         self.assertEqual(self.get_votes(), 0)
 
-    def test_loggin_user_double_hate(self):
+    def test_logged_in_user_double_hate(self):
         self.assertEqual(self.get_votes(), 0)
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': self.question.id,
@@ -144,7 +144,7 @@ class VotingTest(TestCase):
         self.assertEqual(response.content, b'{"status": "OK", "votes": 0}')
         self.assertEqual(self.get_votes(), 0)
 
-    def test_wrong_id(self):
+    def test_logged_in_user_wrong_id(self):
         self.assertEqual(self.get_votes(), 0)
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': 12345,
@@ -155,7 +155,7 @@ class VotingTest(TestCase):
         self.assertEqual(response.content, b'{"status": "FAIL"}')
         self.assertEqual(self.get_votes(), 0)
 
-    def test_wrong_value(self):
+    def test_logged_in_user_wrong_value(self):
         self.assertEqual(self.get_votes(), 0)
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': self.question.id,
@@ -166,7 +166,7 @@ class VotingTest(TestCase):
         self.assertEqual(response.content, b'{"status": "FAIL"}')
         self.assertEqual(self.get_votes(), 0)
 
-    def test_wrong_type(self):
+    def test_logged_in_user_wrong_type(self):
         self.assertEqual(self.get_votes(), 0)
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': self.question.id,
@@ -177,9 +177,9 @@ class VotingTest(TestCase):
         self.assertEqual(response.content, b'{"status": "FAIL"}')
         self.assertEqual(self.get_votes(), 0)
 
-    def test_not_loggin_user_voted(self):
+    def test_not_logged_in_user_voted(self):
         self.assertEqual(self.get_votes(), 0)
-        c = Client(enforce_csrf_checks=True)
+        c = Client()
         r = c.get(reverse('qa:detail', args=[self.question.id]))
         self.assertEqual(r.status_code, 200)
         post_data = {'csrfmiddlewaretoken': r.context['csrf_token'],
@@ -188,6 +188,7 @@ class VotingTest(TestCase):
                      'type': 'question'
                      }
         r = c.post(reverse('qa:update'), post_data)
+        self.assertEqual(r.content, b'{"status": "FAIL"}')
         self.assertEqual(self.get_votes(), 0)
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': self.question.id,
@@ -195,8 +196,86 @@ class VotingTest(TestCase):
                      'type': 'question'
                      }
         r = c.post(reverse('qa:update'), post_data)
+        self.assertEqual(r.content, b'{"status": "FAIL"}')
         self.assertEqual(self.get_votes(), 0)
 
 
 class AcceptAnswerTest(TestCase):
-    pass
+    def get_accepted_answer(self):
+        q_obj = Question.objects.get(pk=self.question.id)
+        return q_obj.accepted_answer
+
+    def setUp(self):
+        self.question = create_question()
+        self.answer_1 = create_answer(self.question)
+        self.answer_2 = create_answer(self.question)
+        self.question.answers.add(self.answer_1)
+        self.question.answers.add(self.answer_2)
+        self.client = Client(enforce_csrf_checks=True)
+        self.client.login(username=self.question.author.username,
+                          password=default_password)
+        response = self.client.get(reverse('qa:detail', args=[self.question.id]))
+        self.csrf_token = response.context['csrf_token']
+
+    def test_question_author_double_accept_answer(self):
+        self.assertEqual(self.get_accepted_answer(), None)
+        post_data = {'csrfmiddlewaretoken': self.csrf_token,
+                     'id': self.answer_1.id
+                     }
+        response = self.client.post(reverse('qa:accept'), post_data)
+        self.assertEqual(response.content, b'{"accepted": true, "status": "OK"}')
+        self.assertEqual(self.get_accepted_answer(), self.answer_1)
+
+        post_data = {'csrfmiddlewaretoken': self.csrf_token,
+                     'id': self.answer_1.id,
+                     }
+        response = self.client.post(reverse('qa:accept'), post_data)
+        self.assertEqual(response.content, b'{"accepted": false, "status": "OK"}')
+        self.assertEqual(self.get_accepted_answer(), None)
+
+    def test_question_author_reaccept_answer(self):
+        self.assertEqual(self.question.accepted_answer, None)
+        post_data = {'csrfmiddlewaretoken': self.csrf_token,
+                     'id': self.answer_1.id,
+                     }
+        response = self.client.post(reverse('qa:accept'), post_data)
+        self.assertEqual(response.content, b'{"accepted": true, "status": "OK"}')
+        self.assertEqual(self.get_accepted_answer(), self.answer_1)
+
+        post_data = {'csrfmiddlewaretoken': self.csrf_token,
+                     'id': self.answer_2.id,
+                     }
+        response = self.client.post(reverse('qa:accept'), post_data)
+        self.assertEqual(response.content, b'{"accepted": true, "status": "OK"}')
+        self.assertEqual(self.get_accepted_answer(), self.answer_2)
+
+    def test_question_author_accept_invalid_answer(self):
+        self.assertEqual(self.get_accepted_answer(), None)
+        post_data = {'csrfmiddlewaretoken': self.csrf_token,
+                     'id': 1234
+                     }
+        response = self.client.post(reverse('qa:accept'), post_data)
+        self.assertEqual(response.content, b'{"status": "FAIL"}')
+        self.assertEqual(self.get_accepted_answer(), None)
+
+    def test_question_author_accept_wrong_answer(self):
+        self.answer_3 = create_answer(self.question)
+        post_data = {'csrfmiddlewaretoken': self.csrf_token,
+                     'id': self.answer_3.id}
+        response = self.client.post(reverse('qa:accept'), post_data)
+        self.assertEqual(response.content, b'{"status": "FAIL"}')
+        self.assertEqual(self.get_accepted_answer(), None)
+
+    def test_not_question_author_accept_answer(self):
+        new_user = create_user()
+        new_client = Client(enforce_csrf_checks=True)
+        new_client.login(username=new_user.username,
+                         password=default_password)
+        response = new_client.get(reverse('qa:detail', args=[self.question.id]))
+        self.assertEqual(self.get_accepted_answer(), None)
+        post_data = {'csrfmiddlewaretoken': response.context['csrf_token'],
+                     'id': self.answer_1.id
+                     }
+        response = new_client.post(reverse('qa:accept'), post_data)
+        self.assertEqual(response.content, b'{"status": "FAIL"}')
+        self.assertEqual(self.get_accepted_answer(), None)

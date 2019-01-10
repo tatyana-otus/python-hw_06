@@ -9,12 +9,9 @@ urlpatterns = [
     path('search/', views.SearchView.as_view(), name='search'),
     path('ask/', login_required(views.AddQuestionView.as_view(),
                                 login_url='users:login'), name='ask'),
-    path('update', login_required(views.update_votes,
-                                 login_url='users:login'), name='update'),
+    path('update', views.update_votes, name='update'),
     path('<int:pk>/', views.QA_DetailView.as_view(), name='detail'),
     path('tags/<int:pk>/', views.TaggedView.as_view(), name='tag'),
     path('trending', views.TrendingView.as_view(), name='trending'),
-
-    path('accept', login_required(views.accept_answer,
-                                 login_url='users:login'), name='accept'),
+    path('accept', views.accept_answer, name='accept'),
 ]

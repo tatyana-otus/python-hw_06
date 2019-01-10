@@ -12,12 +12,12 @@
             <a type="button" class="votingButton btn btn-danger btn-sm" item_id="{{ item.id }}" item_value = "hate" item_type = "{{ qa_type }}" href="{% url 'qa:update' %}">hate</a>
         </div>
         {% if qa_type == "answer" %}
-        <div class="row">
+        <div class="row" id="accepted_{{ item.id }}">
             {% if user == item.question.author %}
                 {% if item.question.accepted_answer == item %}
                     <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accepted !</a>
                 {% else %}
-                    <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accept?</a>
+                    <a class="acceptAnswer text-muted" id="{{ item.id }}" href="{% url 'qa:accept' %}">accept</a>
                 {% endif %}
             {% else %}
                 {% if item.question.accepted_answer == item %}
