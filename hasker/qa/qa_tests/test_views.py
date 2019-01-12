@@ -180,7 +180,8 @@ class ViewTest(TestCase):
     def test_redirect_ask_if_not_logged_in(self):
         client = Client()
         response = client.get(reverse('qa:ask'))
-        self.assertRedirects(response, '/users/login/?next=/questions/ask/')
+        redirect_url = reverse('users:login')+"?next="+reverse('qa:ask')
+        self.assertRedirects(response, redirect_url)
 
     def test_ask_if_logged_in_(self):
         client = Client(enforce_csrf_checks=True)

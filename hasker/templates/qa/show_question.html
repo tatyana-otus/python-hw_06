@@ -1,3 +1,4 @@
+{% load humanize %}
 <div class="row">
     <div class="col-lg-2">
         <div class="row justify-content-center">{{ question.votes }}</div>
@@ -28,7 +29,9 @@
             {% endif %}
             
         </div>
-            <div class="row justify-content-center">{{ question.date | date:"m.d.Y" }}</div> 
+        <div class="row justify-content-center text-center">
+            {{ question.date | naturaltime }}
+        </div> 
     </div>
 </div>
 <hr class="half-rule"/>

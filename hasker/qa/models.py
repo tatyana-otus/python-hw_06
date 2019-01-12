@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from hasker.qa.utils.helper import *
 
+
 class QA(models.Model):
     body = models.TextField()
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -27,7 +28,7 @@ class QA(models.Model):
     def show_dislikes(self):
         return str(self.u_dislikes.count())
 
-    def hate_this(self, user, hate = True):
+    def hate_this(self, user, hate=True):
         if hate:
             self.u_likes.remove(user)
             if user in self.u_dislikes.all():
@@ -40,7 +41,7 @@ class QA(models.Model):
                 self.u_likes.remove(user)
             else:
                 self.u_likes.add(user)
-        return self.u_likes.count() - self.u_dislikes.count();
+        return self.u_likes.count() - self.u_dislikes.count()
 
 
 class Tag(models.Model):
@@ -59,15 +60,14 @@ class Answer(QA):
                                         blank=True)
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
 
-
     def save_new_answer(self, author, question_pk, body):
         with transaction.atomic():
             q = Question.objects.get(pk=question_pk)
-            self.date = datetime.now(pytz.timezone(settings.TIME_ZONE));
+            self.date = datetime.now(pytz.timezone(settings.TIME_ZONE))
             self.author = author
             self.question = q
             self.save()
-            q.answers.add(self)   # !!!
+            q.answers.add(self)
             new_answer_notify(q.author.email, q.get_absolute_url)
 
     def accept(self, question_author):
@@ -113,7 +113,7 @@ class Question(QA):
 
     def save_new_question(self, author, tag_list):
         with transaction.atomic():
-            self.date = datetime.now(pytz.timezone(settings.TIME_ZONE));
+            self.date = datetime.now(pytz.timezone(settings.TIME_ZONE))
             self.author = author
             self.save()
             for t in tag_list:

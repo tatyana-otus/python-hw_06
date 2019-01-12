@@ -28,8 +28,8 @@ STATICFILES_DIRS = [
 ]
 
 TRENDING_NUM = 20
-QUESTION_PAGINATE = 4
-ANSWER_PAGINATE = 4
+QUESTION_PAGINATE = 20
+ANSWER_PAGINATE = 30
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
 ]
 
 AUTH_USER_MODEL = 'users.Profile'

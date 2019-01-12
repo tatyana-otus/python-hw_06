@@ -1,0 +1,5 @@
+Django==2.1.4
+psycopg2
+Pillow
+psycopg2-binary
+faker

@@ -2,6 +2,7 @@ from django.test import Client, TestCase
 
 from .helper import *
 
+
 class HelperTest(TestCase):
 
     def test_parse_search_empty_string(self):

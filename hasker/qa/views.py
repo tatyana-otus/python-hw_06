@@ -1,5 +1,4 @@
 from django import forms
-from django.http import HttpResponse
 from django.views import generic
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -30,13 +29,13 @@ class IndexView(generic.ListView):
         return queryset
 
     def build_queryset(self):
-        return  Question.objects\
-                        .prefetch_related('tags')\
-                        .select_related('author')\
-                        .annotate(Count('answers', distinct=True),\
-                                  Count('u_likes', distinct=True),\
-                                  Count('u_dislikes', distinct=True))\
-                        .annotate(votes=F('u_likes__count') - F('u_dislikes__count'))
+        return Question.objects\
+                       .prefetch_related('tags')\
+                       .select_related('author')\
+                       .annotate(Count('answers', distinct=True),
+                                 Count('u_likes', distinct=True),
+                                 Count('u_dislikes', distinct=True))\
+                       .annotate(votes=F('u_likes__count') - F('u_dislikes__count'))
 
     def get_queryset(self):
         qs = self.build_queryset()
@@ -79,13 +78,13 @@ class TaggedView(IndexView):
 
 
 class AddQuestionView(generic.View):
-    template_name='users/signup.html',
+    template_name = 'users/signup.html'
     form_class = AddQuestionForm
     ctx_obj_name = 'form'
 
     def get(self, request, *args, **kwargs):
         return render(request, self.template_name, {self.ctx_obj_name: self.form_class})
-  
+
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
@@ -102,8 +101,8 @@ class TrendingView(generic.ListView):
         return Question.objects.order_by('-votes', '-date')\
                        .annotate(Count('u_likes', distinct=True),
                                  Count('u_dislikes', distinct=True))\
-                       .annotate(votes=F('u_likes__count') -\
-                                       F('u_dislikes__count'))[:settings.TRENDING_NUM]
+                       .annotate(votes=F('u_likes__count') -
+                                 F('u_dislikes__count'))[:settings.TRENDING_NUM]
 
 
 class QA_DetailView(generic.ListView):
@@ -116,18 +115,16 @@ class QA_DetailView(generic.ListView):
         super().__init__(*args, **kwargs)
         self.answer_form = self.form_class()
 
-
     def get_queryset(self):
         question_pk = self.kwargs.get('pk')
         q = get_object_or_404(Question, pk=question_pk)
         return q.answers.all()\
-                .annotate(Count('u_likes', distinct=True),\
+                .annotate(Count('u_likes', distinct=True),
                           Count('u_dislikes', distinct=True))\
-                .annotate(votes=F('u_likes__count') -\
-                                F('u_dislikes__count'))\
+                .annotate(votes=F('u_likes__count') -
+                          F('u_dislikes__count'))\
                 .order_by('-date')\
                 .select_related('author')
-
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -135,9 +132,9 @@ class QA_DetailView(generic.ListView):
 
         context['question'] = Question.objects\
                                       .annotate(Count('u_likes', distinct=True),
-                                                 Count('u_dislikes', distinct=True))\
-                                      .annotate(votes=F('u_likes__count') -\
-                                                       F('u_dislikes__count'))\
+                                                Count('u_dislikes', distinct=True))\
+                                      .annotate(votes=F('u_likes__count') -
+                                                F('u_dislikes__count'))\
                                       .get(pk=question_pk)
         context['form'] = self.answer_form
         return context
@@ -180,7 +177,7 @@ def update_votes(request):
     except Exception as e:
         return JsonResponse({'status': 'FAIL'})
     return JsonResponse({'status': 'OK', 'votes': votes},
-                        json_dumps_params = {'sort_keys': True})
+                        json_dumps_params={'sort_keys': True})
 
 
 @require_http_methods(["POST"])
@@ -195,4 +192,4 @@ def accept_answer(request):
     except Exception as e:
         return JsonResponse({'status': 'FAIL'})
     return JsonResponse({'status': 'OK', "accepted": result},
-                        json_dumps_params = {'sort_keys': True})
+                        json_dumps_params={'sort_keys': True})

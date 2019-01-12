@@ -2,6 +2,7 @@ import re
 
 from django.core import mail
 
+
 def parse_search_string(search_string):
     tag_names = []
     find_value = ""
@@ -12,7 +13,7 @@ def parse_search_string(search_string):
 
 def set_filter_by_tag_names(queryset, names):
     for name in names:
-        queryset = queryset.filter(tags__name=name)  
+        queryset = queryset.filter(tags__name=name)
     return queryset
 
 

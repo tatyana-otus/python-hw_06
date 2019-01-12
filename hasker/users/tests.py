@@ -6,12 +6,6 @@ from hasker.users.models import Profile
 
 class UsersTest(TestCase):
 
-    def test_not_logged(self):
-        client = Client()
-        response = client.get(reverse('qa:questions'))
-        self.assertEqual(response.status_code, 200)
-        self.assertFalse(response.context['user'].is_authenticated)
-
     def test_signup_ok(self):
         self.assertEqual(Profile.objects.count(), 0)
         client = Client(enforce_csrf_checks=True)
@@ -53,3 +47,21 @@ class UsersTest(TestCase):
         response = client.post(reverse('users:login'), post_data, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['user'].is_authenticated)
+
+    def test_settings_if_logged_in(self):
+        account = {'username': 'tany_2',
+                   'email': 'email@mail.com',
+                   'password': '12345_qwert'}
+        user = Profile.objects.create_user(**account)
+        client = Client()
+        client.login(username=account['username'],
+                     password=account['password'])
+        response = client.get(reverse('users:settings'))
+        self.assertContains(response, account['email'])
+        self.assertContains(response, account['username'])
+
+    def test_settings_redirect_if_not_logged_in(self):
+        client = Client()
+        response = client.get(reverse('users:settings'))
+        redirect_url = reverse('users:login')+"?next="+reverse('users:settings')
+        self.assertRedirects(response, redirect_url)
