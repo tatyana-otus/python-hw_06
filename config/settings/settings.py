@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 from os.path import abspath, dirname, join
 
+DEV_DB_HOST = 'localhost'
+DEV_DB_PORT = '5333'
 
 def root(*dirs):
     base_dir = join(dirname(__file__), '..', '..', 'hasker')
@@ -99,14 +101,15 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'hasker_db',
         'USER': 'hasker_db_user',
         'PASSWORD': 'hasker_db_user_pass',
-        'HOST': '0.0.0.0',
-        'PORT': '5432',
+        'HOST': DEV_DB_HOST,
+        'PORT': DEV_DB_PORT,
     }
 }
 
