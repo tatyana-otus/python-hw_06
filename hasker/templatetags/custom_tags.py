@@ -10,7 +10,7 @@ def http_get_param_replace(context, **kwargs):
     Return encoded URL parameters that are the same as the current
     request's parameters, only with the specified GET parameters added or changed.
 
-    For example, if you're on the page 
+    For example, if you're on the page
     /questions/?tab=hot,
 
     then

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 from os.path import abspath, dirname, join
 
+
 def root(*dirs):
     base_dir = join(dirname(__file__), '..', '..', 'hasker')
     return abspath(join(base_dir, *dirs))
@@ -24,7 +25,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     root('static'),
-    # '/var/www/static/',
 ]
 
 TRENDING_NUM = 20
