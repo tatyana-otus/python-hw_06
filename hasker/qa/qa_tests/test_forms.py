@@ -18,21 +18,21 @@ class AddQuestionFormTest(TestCase):
         form = AddQuestionForm(data)
         self.assertTrue(form.is_valid())
 
-    def test_emty_title(self):
+    def test_empty_title(self):
         data = {'title': '',
                 'body': 'some text',
                 'form_tags': 't1'}
         form = AddQuestionForm(data)
         self.assertFalse(form.is_valid())
 
-    def test_emty_body(self):
+    def test_empty_body(self):
         data = {'title': 'some title',
                 'body': '',
                 'form_tags': 't1'}
         form = AddQuestionForm(data)
         self.assertFalse(form.is_valid())
 
-    def test_emty_tags(self):
+    def test_empty_tags(self):
         data = {'title': 'some title',
                 'body': 'some text',
                 'form_tags': ''}
