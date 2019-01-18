@@ -18,11 +18,6 @@ class ProfileCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].label = "Login"
-        self.fields['email'].label = "Emai"
-        self.fields['password1'].label = "Password"
-        self.fields['password2'].label = "Repeat Password"
-        self.fields['avatar'].label = "Avatar"
 
     field_order = ['username', 'email', 'password1', 'password2', 'avatar']
 
@@ -33,8 +28,6 @@ class LoginForm(AuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].label = "Login"
-        self.fields['password'].label = "Password"
 
     class Meta(AuthenticationForm):
         model = Profile
@@ -53,9 +46,7 @@ class ProfileChangeForm(ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].label = "Login"
-        self.fields['email'].label = "Emai"
-        self.fields['avatar'].label = "Avatar"
+
         self.fields['username'].disabled = True
         self.fields['username'].help_text = ""
 

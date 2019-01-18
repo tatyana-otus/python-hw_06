@@ -10,7 +10,7 @@ class AddQuestionForm(forms.ModelForm):
     header_title = "Ask a question"
     submit_title = "Save"
 
-    form_tags = forms.CharField(required=True)
+    form_tags = forms.CharField(required=True, label='Tags')
 
     class Meta:
         model = Question
@@ -18,16 +18,12 @@ class AddQuestionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['title'].label = "Title"
-        self.fields['body'].label = "Text"
-        self.fields['form_tags'].label = "Tags"
 
     field_order = ['title', 'body', 'form_tags']
 
     def clean_form_tags(self):
         tags = self.cleaned_data['form_tags'].lower()
-        tags = [t.strip() for t in tags.split(",")]
-        tags = [t for t in tags if t]
+        tags = [t.strip() for t in tags.split(",") if t.strip()]
         max_tag_length = Tag._meta.get_field('name').max_length
         if len(tags) > Question.TAGS_NUM:
             raise forms.ValidationError('Number of tags must be less than: %(len)s',

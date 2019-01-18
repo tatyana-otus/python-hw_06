@@ -1,14 +1,12 @@
 <div class="row">
     <div class="container">
-    {% if question_list %}
-        {% for question in question_list %}
-            {% include "qa/show_question.html" %}
-        {% endfor %}
-    {% else %}
-            <div class="row justify-content-center">
-                <h2>No questions are available</h2>
-            </div>
-    {% endif %}
+    {% for question in question_list %}
+        {% include "qa/show_question.html" %}
+    {% empty %}
+        <div class="row justify-content-center">
+            <h2>No questions are available</h2>
+        </div>    
+    {% endfor %}
     </div>
 </div>
 <div class="row">

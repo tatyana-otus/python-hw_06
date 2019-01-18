@@ -10,12 +10,12 @@
     </div>
     <div class="col">
         <div class="row justify-content-center">
-            <a href="{{ question.get_absolute_url }}">{{ question.title }}</a>  
+            <a href="{% url 'qa:detail' question.id %}">{{ question.title }}</a>  
         </div>  
         <div class="row justify-content-center">
             <div class="btn-toolbar">
             {% for tag in question.get_tags %}
-                <a type="button" class="btn btn-primary btn-sm mr-1" href="{{ tag.get_absolute_url }}">{{ tag.name }}</a>
+                <a type="button" class="btn btn-primary btn-sm mr-1" href="{% url 'qa:tag' tag.id %}">{{ tag.name }}</a>
             {% endfor %} 
             </div>
         </div> 

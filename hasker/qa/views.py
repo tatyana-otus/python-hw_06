@@ -1,3 +1,5 @@
+import logging
+
 from django import forms
 from django.views import generic
 from django.shortcuts import render, redirect, get_object_or_404
@@ -10,6 +12,8 @@ from django.conf import settings
 from hasker.qa.utils.helper import *
 from .models import Question, Answer, Tag
 from .forms import AddQuestionForm, AddAnswerForm
+
+logger = logging.getLogger(__name__)
 
 
 class IndexView(generic.ListView):
@@ -175,6 +179,7 @@ def update_votes(request):
         else:
             raise ValueError("Wrong update")
     except Exception as e:
+        logger.error('update_votes failed: {} {} {}'.format(item_id, item_value, item_type))
         return JsonResponse({'status': 'FAIL'})
     return JsonResponse({'status': 'OK', 'votes': votes},
                         json_dumps_params={'sort_keys': True})
@@ -190,6 +195,7 @@ def accept_answer(request):
         obj = Answer.objects.get(pk=item_id)
         result = obj.accept(request.user)
     except Exception as e:
+        logger.error('accept_answer failed: {} {}'.format(item_id, item_value))
         return JsonResponse({'status': 'FAIL'})
     return JsonResponse({'status': 'OK', "accepted": result},
                         json_dumps_params={'sort_keys': True})

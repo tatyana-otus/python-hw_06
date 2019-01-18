@@ -2,12 +2,11 @@
 
 <!DOCTYPE html>
 <html>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   <meta charset="utf-8">
 <head>
 {% load static %}
-<link rel="shortcut icon" type="image/png" href="{% static 'favicon.ico' %}"/>
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<link rel="shortcut icon" type="image/png" href="{% static 'images/favicon.ico' %}"/>
+<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}"/>
 </head>
 <body>
   <main>
@@ -28,56 +27,9 @@
     </div>
   </main>
 
-<script>
-    $( "#trending" ).load( "/questions/trending" );
-</script>
-
-<script>
-    $('body').on('click', '.votingButton', function(){
-        var item_id    = $(this).attr('item_id');
-        var item_value = $(this).attr('item_value');
-        var item_type  = $(this).attr('item_type');
-
-        req = $.ajax({
-            url:  $(this).attr('href'),
-            type: 'POST',
-            data: {id: item_id, value: item_value, type: item_type,
-            csrfmiddlewaretoken: '{{ csrf_token }}' }
-        });
-        req.done(function(data){
-            uniq_id = "#"+item_type+"_"+item_id
-            if (data.status == 'OK'){
-                $(uniq_id).text(data.votes);
-            }
-        })
-        return false;
-    });
-</script>
-
-<script>
-    $('body').on('click', '.acceptAnswer', function(){
-        var item_id    = $(this).attr('id');
-        req = $.ajax({
-            url:  $(this).attr('href'),
-            type: 'POST',
-            data: {id: item_id,
-            csrfmiddlewaretoken: '{{ csrf_token }}' }
-        });
-
-        req.done(function(data){
-            if (data.status == 'OK'){
-                uniq_id = "#"+item_id
-                $('.acceptAnswer').addClass("text-muted");
-                $('.acceptAnswer').text ("accept");
-                if (data.accepted == true){
-                    $(uniq_id).removeClass("text-muted");
-                    $(uniq_id).text ("accepted !");
-                }
-            }
-        })
-        return false;
-    });
-</script>
+{% load static %}
+<script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+<script src="{% static 'js/trending.js' %}"></script>
 
 </body>
 

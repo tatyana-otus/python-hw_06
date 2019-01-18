@@ -20,7 +20,7 @@ urlpatterns = [
                                      success_url=reverse_lazy('qa:questions')),
         name='login'),
     path(
-        'settings/', login_required(views.EditProfile, login_url='users:login'), name='settings'),
+        'settings/', login_required(views.EditProfile.as_view(), login_url='users:login'), name='settings'),
     path(
         'logout/',
         auth_views.LogoutView.as_view(), name='logout'),

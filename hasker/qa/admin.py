@@ -5,12 +5,12 @@ from .models import Question, Answer, Tag
 
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ('title', 'body', 'author', 'date',
-                    'show_likes', 'show_dislikes', 'show_tags')
+                    'counts_likes', 'counts_dislikes', 'show_tags')
 
 
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ('body', 'author', 'date',
-                    'show_likes', 'show_dislikes')
+                    'counts_likes', 'counts_dislikes')
 
 
 class TagAdmin(admin.ModelAdmin):

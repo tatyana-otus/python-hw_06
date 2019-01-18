@@ -8,15 +8,13 @@
     {% include "qa/qa_item.html" with item=question qa_type="question" %}
     <div class="row">
         <div class="container" id ="answers">
-            {% if items %} 
-                {% for item in items %}
-                    {% include "qa/qa_item.html" with qa_type="answer" %}
-                {% endfor %}
-            {% else %}
+            {% for item in items %}
+                {% include "qa/qa_item.html" with qa_type="answer" %}
+            {% empty %}
                 <div class="row justify-content-center">
                     <h2>No answers are available</h2>
                 </div>
-            {% endif %}
+            {% endfor %}
         </div>
     </div>
     <div class="row">
@@ -35,5 +33,54 @@
     </div>
 {% endif %}
 </div>
+
+{% load static %}
+<script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+<script>
+$(document).ready(function() { 
+
+    $(".votingButton").click(function(){
+        var item_id    = $(this).attr('item_id');
+        var item_value = $(this).attr('item_value');
+        var item_type  = $(this).attr('item_type');
+
+        req = $.ajax({
+            url:  $(this).attr('href'),
+            type: 'POST',
+            data: {id: item_id, value: item_value, type: item_type,
+            csrfmiddlewaretoken: '{{ csrf_token }}' },
+            success:function(data) {
+                uniq_id = "#"+item_type+"_"+item_id
+                if (data.status == 'OK'){
+                    $(uniq_id).text(data.votes);
+                }
+            }
+        });
+        return false;
+    });
+
+    $(".acceptAnswer").click(function(){    
+        var item_id    = $(this).attr('id');
+        req = $.ajax({
+            url:  $(this).attr('href'),
+            type: 'POST',
+            data: {id: item_id,
+            csrfmiddlewaretoken: '{{ csrf_token }}'},
+            success:function(data) {
+                if (data.status == 'OK'){
+                    uniq_id = "#"+item_id
+                    $('.acceptAnswer').addClass("text-muted");
+                    $('.acceptAnswer').text ("accept");
+                    if (data.accepted == true){
+                        $(uniq_id).removeClass("text-muted");
+                        $(uniq_id).text ("accepted !");
+                    }
+                }    
+            }
+        });
+        return false;
+    });
+});
+</script>
 
 {% endblock %}

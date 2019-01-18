@@ -40,7 +40,7 @@
             {% if item.get_tags %}
             <div class="col col text-right">
                 {% for tag in item.get_tags %}
-                    <a type="button" class="btn btn-primary btn-sm mr-1" href="{{ tag.get_absolute_url }}">{{ tag.name }}</a>
+                    <a type="button" class="btn btn-primary btn-sm mr-1" href="{% url 'qa:tag' tag.id %}">{{ tag.name }}</a>
                 {% endfor %}
             </div>
             {% endif %}

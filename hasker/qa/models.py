@@ -10,7 +10,7 @@ from hasker.qa.utils.helper import *
 
 
 class QA(models.Model):
-    body = models.TextField()
+    body = models.TextField(verbose_name='Text')
     author = models.ForeignKey(settings.AUTH_USER_MODEL,
                                on_delete=models.CASCADE)
     date = models.DateTimeField()
@@ -22,10 +22,10 @@ class QA(models.Model):
     def get_tags(self):
         return None
 
-    def show_likes(self):
+    def counts_likes(self):
         return str(self.u_likes.count())
 
-    def show_dislikes(self):
+    def counts_dislikes(self):
         return str(self.u_dislikes.count())
 
     def hate_this(self, user, hate=True):
@@ -47,9 +47,6 @@ class QA(models.Model):
 class Tag(models.Model):
     name = models.CharField(max_length=32, unique=True)
 
-    def get_absolute_url(self):
-        return reverse('qa:tag', args=[self.id])
-
 
 class Answer(QA):
     u_likes = models.ManyToManyField(settings.AUTH_USER_MODEL,
@@ -68,7 +65,7 @@ class Answer(QA):
             self.question = q
             self.save()
             q.answers.add(self)
-            new_answer_notify(q.author.email, q.get_absolute_url)
+            new_answer_notify(q.author.email, reverse('qa:detail', args=[question_pk]))
 
     def accept(self, question_author):
         with transaction.atomic():
@@ -79,16 +76,15 @@ class Answer(QA):
                 q.accepted_answer = None
                 q.save()
                 return False
-            else:
-                q.accepted_answer = self
-                q.save()
-                return True
+            q.accepted_answer = self
+            q.save()
+            return True
 
 
 class Question(QA):
     TAGS_NUM = 3
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, verbose_name='Title')
     tags = models.ManyToManyField(Tag, blank=True)
     accepted_answer = models.ForeignKey(Answer, on_delete=models.CASCADE,
                                         related_name='accepted_answer',
@@ -103,13 +99,10 @@ class Question(QA):
                                         blank=True)
 
     def show_tags(self):
-        return " ".join(t.name for t in self.tags.all())
+        return list(self.tags.values_list('name', flat=True))
 
     def get_tags(self):
         return self.tags.all()
-
-    def get_absolute_url(self):
-        return reverse('qa:detail', args=[self.id])
 
     def save_new_question(self, author, tag_list):
         with transaction.atomic():
@@ -118,6 +111,4 @@ class Question(QA):
             self.save()
             for t in tag_list:
                 tag, created = Tag.objects.get_or_create(name=t)
-                if created:
-                    tag.save()
                 self.tags.add(tag)

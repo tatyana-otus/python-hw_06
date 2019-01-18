@@ -1,0 +1,1 @@
+$( "#trending" ).load( "/questions/trending" );
