@@ -230,7 +230,7 @@ class AcceptAnswerTest(TestCase):
                      'id': self.answer_1.id,
                      }
         response = self.client.post(reverse('qa:accept'), post_data)
-        self.assertEqual(response.content, b'{"accepted": false, "status": "OK"}')
+        self.assertEqual(response.content, b'{"accepted": null, "status": "OK"}')
         self.assertEqual(self.get_accepted_answer(), None)
 
     def test_question_author_reaccept_answer(self):

@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class IndexView(generic.ListView):
-    template_name = 'home.html'
+    template_name = 'qa/home.html'
     paginate_by = settings.QUESTION_PAGINATE
     context_object_name = 'question_list'
     sort = {'new': ['-date', '-votes'], 'hot': ['-votes', '-date']}
@@ -98,7 +98,7 @@ class AddQuestionView(generic.View):
 
 
 class TrendingView(generic.ListView):
-    template_name = 'qa/trending.html'
+    template_name = 'include/trending.html'
     context_object_name = 'question_list'
 
     def get_queryset(self):

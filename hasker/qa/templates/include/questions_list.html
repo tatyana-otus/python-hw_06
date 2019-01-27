@@ -1,7 +1,7 @@
 <div class="row">
     <div class="container">
     {% for question in question_list %}
-        {% include "qa/show_question.html" %}
+        {% include "include/show_question.html" %}
     {% empty %}
         <div class="row justify-content-center">
             <h2>No questions are available</h2>
@@ -10,5 +10,5 @@
     </div>
 </div>
 <div class="row">
-    {% include "qa/pagination.html" %}
+    {% include "include/pagination.html" %}
 </div>

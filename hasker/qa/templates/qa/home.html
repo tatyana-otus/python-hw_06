@@ -2,8 +2,7 @@
 
 {% extends 'base.html' %}
 
-{% block content %}
-<div class="container">
+{% block title %}
     {% if title %}
         <h2>{{ title }}</h2>
     {% else %}
@@ -12,8 +11,18 @@
             <h2>&nbsp;|&nbsp;</h2>
             <h2><a href="{% url 'qa:questions' %}?tab=hot"> Hot questions</a></h2>
         </div>
-    {% endif %}
+    {% endif %}   
+{% endblock %}
+
+{% block content %}
+<div class="container">
 <hr>
-{% include "qa/questions_list.html" %}
+{% include "include/questions_list.html" %}
 </div>
 {% endblock %}
+
+{% load static %}
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static 'js/trending.js' %}"></script>
+{% endblock %}    

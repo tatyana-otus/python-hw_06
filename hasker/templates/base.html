@@ -12,24 +12,25 @@
   <main>
     <div class="wrapper container">
         <div class="row">
-            {% include "header.html" %}
+            {% include "include/header.html" %}
         </div>  
         <hr>
+        {% block title %}{% endblock title %}
         <div class="row">
           <div class="col">
               {% block content %}
               {% endblock %}
           </div> 
           <div class="col col-lg-3">
-            {% include "right.html" %}
+            {% include "include/right.html" %}
           </div> 
         </div> 
     </div>
   </main>
 
-{% load static %}
-<script src="{% static 'js/jquery-3.3.1.js' %}"></script>
-<script src="{% static 'js/trending.js' %}"></script>
-
+{% block scripts %}
+  <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+{% endblock %}
 </body>
+</html>
 

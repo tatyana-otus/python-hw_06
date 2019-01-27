@@ -9,7 +9,7 @@ from .models import Question, Tag, Answer
 class AddQuestionForm(forms.ModelForm):
     header_title = "Ask a question"
     submit_title = "Save"
-
+    field_order = ['title', 'body', 'form_tags']
     form_tags = forms.CharField(required=True, label='Tags')
 
     class Meta:
@@ -18,8 +18,6 @@ class AddQuestionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    field_order = ['title', 'body', 'form_tags']
 
     def clean_form_tags(self):
         tags = self.cleaned_data['form_tags'].lower()
@@ -44,6 +42,9 @@ class AddQuestionForm(forms.ModelForm):
 
 
 class AddAnswerForm(forms.ModelForm):
+    header_title = "Your answer"
+    submit_title = "Submit"
+
     class Meta:
         model = Answer
         fields = ['body']
@@ -51,9 +52,6 @@ class AddAnswerForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['body'].label = ""
-
-    header_title = "Your answer"
-    submit_title = "Submit"
 
     def save(self, author, question_pk, commit=True):
         answer = super().save(commit=False)

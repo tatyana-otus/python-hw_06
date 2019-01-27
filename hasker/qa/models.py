@@ -29,18 +29,17 @@ class QA(models.Model):
         return str(self.u_dislikes.count())
 
     def hate_this(self, user, hate=True):
-        if hate:
-            self.u_likes.remove(user)
-            if user in self.u_dislikes.all():
-                self.u_dislikes.remove(user)
-            else:
-                self.u_dislikes.add(user)
-        else:
-            self.u_dislikes.remove(user)
-            if user in self.u_likes.all():
+        with transaction.atomic():
+            if hate:
                 self.u_likes.remove(user)
+                change_hate = self.u_dislikes
             else:
-                self.u_likes.add(user)
+                self.u_dislikes.remove(user)
+                change_hate = self.u_likes
+            if change_hate.filter(pk=user.id).exists():
+                change_hate.remove(user)
+            else:
+                change_hate.add(user)
         return self.u_likes.count() - self.u_dislikes.count()
 
 
@@ -75,7 +74,7 @@ class Answer(QA):
             if q.accepted_answer == self:
                 q.accepted_answer = None
                 q.save()
-                return False
+                return
             q.accepted_answer = self
             q.save()
             return True
@@ -110,5 +109,4 @@ class Question(QA):
             self.author = author
             self.save()
             for t in tag_list:
-                tag, created = Tag.objects.get_or_create(name=t)
-                self.tags.add(tag)
+                self.tags.add(Tag.objects.get_or_create(name=t)[0])

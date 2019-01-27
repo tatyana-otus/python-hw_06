@@ -1,9 +1,14 @@
-<!-- templates/qa/qa_item.html -->
-
 <div class="row">
     <div class="col col-lg-2 align-self-center">
         <div class="row">
             <a type="button" class="votingButton btn btn-success btn-sm" item_id="{{ item.id }}"item_value = "love" item_type = "{{ qa_type }}" href="{% url 'qa:update' %}">love</a>
+<!--             <form id="form_id" action="{% url 'qa:update' %}" change_item="{{ qa_type }}_{{ item.id }}">
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ item.id }}" />
+                <input type="hidden" name="value" value="love" />
+                <input type="hidden" name="type" value="{{ qa_type }}" />
+                <a type="button" class="btn btn-success btn-sm">love</a>
+            </form> -->
         </div>
         <div class="row">
             <h2 id="{{ qa_type }}_{{ item.id }}">{{ item.votes }}</h2>

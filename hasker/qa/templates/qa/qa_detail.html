@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    {% include "include/qa_item.html" with item=question qa_type="question" %}
+    <div class="row">
+        <div class="container" id ="answers">
+            {% for item in items %}
+                {% include "include/qa_item.html" with qa_type="answer" %}
+            {% empty %}
+                <div class="row justify-content-center">
+                    <h2>No answers are available</h2>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        {% include "include/pagination.html" %}
+    </div> 
+{% if user.is_authenticated %}
+    <div class="row">
+        <h3>Your answer</h3>
+    </div> 
+    <div class="row">
+        <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <p><input type="submit" class="btn btn-primary" value=Submit /></p>
+        </form>
+    </div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% load static %}
+{% block scripts %}
+    {{ block.super }}
+      <script src="{% static 'js/trending.js' %}"></script>
+    <script>
+    $(document).ready(function() { 
+        // var form = $('#form_id_1');
+        // form.find('a:first').click( function() {
+        //     $.ajax( {
+        //         type: "POST",
+        //         url: form.attr('action'),
+        //         data: form.serialize(),
+        //         success: function(data) {
+        //             uniq_id = form.attr('change_item')
+        //             console.log(uniq_id)
+        //             if (data.status == 'OK'){
+        //                 $("#"+uniq_id).text(data.votes);
+        //             }
+        //         }
+        //     });
+        // });
+
+        $(".votingButton").click(function(){
+            var item_id    = $(this).attr('item_id');
+            var item_value = $(this).attr('item_value');
+            var item_type  = $(this).attr('item_type');
+
+            req = $.ajax({
+                url:  $(this).attr('href'),
+                type: 'POST',
+                data: {id: item_id, value: item_value, type: item_type,
+                csrfmiddlewaretoken: '{{ csrf_token }}' },
+                success:function(data) {
+                    uniq_id = "#"+item_type+"_"+item_id
+                    console.log(uniq_id)
+                    if (data.status == 'OK'){
+                        $(uniq_id).text(data.votes);
+                    }
+                }
+            });
+            return false;
+        });
+
+        $(".acceptAnswer").click(function(){    
+            var item_id    = $(this).attr('id');
+            req = $.ajax({
+                url:  $(this).attr('href'),
+                type: 'POST',
+                data: {id: item_id,
+                csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success:function(data) {
+                    if (data.status == 'OK'){
+                        uniq_id = "#"+item_id
+                        $('.acceptAnswer').addClass("text-muted");
+                        $('.acceptAnswer').text ("accept");
+                        if (data.accepted == true){
+                            $(uniq_id).removeClass("text-muted");
+                            $(uniq_id).text ("accepted !");
+                        }
+                    }    
+                }
+            });
+            return false;
+        });
+    });
+    </script>
+{% endblock %}

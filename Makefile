@@ -2,11 +2,15 @@ DB_HOST = localhost
 DB_PORT = 5338
 DB_NAME = hasker_db
 DB_USER = hasker_db_user 
-DB_PASSWORD = hasker_db_user_pass
 
 DOCKER_DB_VOLUME = hasker_db_volume
 
 build:
+	@while [ -z "$$DB_PASSWORD" ]; do \
+		read -r -p "DataBase password: " DB_PASSWORD; \
+	done 
+
+
 	@if ! sudo docker run -p $(DB_PORT):5432 -d --name $(DB_NAME) -v $(DOCKER_DB_VOLUME):/var/lib/postgresql/data postgres:9.6; then\
 		make clean --ignore-errors;\
 		sudo docker run -p $(DB_PORT):5432 -d --name $(DB_NAME) -v $(DOCKER_DB_VOLUME):/var/lib/postgresql/data postgres:9.6;\
@@ -22,12 +26,9 @@ build:
 
 dev:
 	@if pg_isready -h $(DB_HOST) -p $(DB_PORT) > /dev/null 2> /dev/null; then\
-		sudo docker run -it --rm -e HASKER_DB_PORT=$(DB_PORT)\
-		-e HASKER_DB_HOST=$(DB_HOST)\
-		-e HASKER_DB_NAME=$(DB_NAME)\
-		-e HASKER_DB_USER=$(DB_USER)\
-		-e HASKER_DB_PASSWORD=$(DB_PASSWORD)\
-		--net=host hasker /bin/bash -c "python3 /opt/hasker/manage.py migrate && python3 /opt/hasker/manage.py runserver";\
+		sudo docker run -it --rm --net=host hasker /bin/bash -c\
+		"python3 /opt/hasker/manage.py migrate &&\
+		 python3 /opt/hasker/manage.py runserver";\
 	else\
 		echo "run: make clean --ignore-errors && make build";\
 	fi
@@ -35,12 +36,22 @@ dev:
 test:
 	@if pg_isready -h $(DB_HOST) -p $(DB_PORT) > /dev/null 2> /dev/null; then\
 		psql -h $(DB_HOST) -p $(DB_PORT) -U postgres -c "ALTER USER $(DB_USER) CREATEDB;";\
-		sudo docker run -it --rm -e HASKER_DB_PORT=$(DB_PORT)\
-		-e HASKER_DB_HOST=$(DB_HOST)\
-		-e HASKER_DB_NAME=$(DB_NAME)\
-		-e HASKER_DB_USER=$(DB_USER)\
-		-e HASKER_DB_PASSWORD=$(DB_PASSWORD)\
-		--net=host hasker /bin/bash -c "python3 /opt/hasker/manage.py test hasker -v 2";\
+		sudo docker run -it --rm --net=host hasker /bin/bash -c\
+		"python3 /opt/hasker/manage.py test hasker -v 2";\
+	else\
+		echo "run: make clean --ignore-errors && make build";\
+	fi
+
+nginx:
+	@if pg_isready -h $(DB_HOST) -p $(DB_PORT) > /dev/null 2> /dev/null; then\
+		sudo docker run -it --rm --net=host hasker /bin/bash -c\
+		"mkdir /run/uwsgi &&\
+		cd /opt/hasker &&\
+		python3 manage.py migrate &&\
+		python3 manage.py collectstatic &&\
+		cp hasker_nginx.conf /etc/nginx/conf.d &&\
+		/etc/init.d/nginx start &&\
+		uwsgi --socket /run/uwsgi/hasker.sock --module config.wsgi --chmod-socket=777";\
 	else\
 		echo "run: make clean --ignore-errors && make build";\
 	fi

@@ -9,22 +9,22 @@ from .models import Profile
 
 
 class ProfileCreationForm(UserCreationForm):
+    header_title = "SignUp"
+    submit_title = "SignUp"
+    field_order = ['username', 'email', 'password1', 'password2', 'avatar']
+
     class Meta:
         model = Profile
         fields = ['avatar', 'username', 'email']
 
-    header_title = "SignUp"
-    submit_title = "SignUp"
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    field_order = ['username', 'email', 'password1', 'password2', 'avatar']
 
 
 class LoginForm(AuthenticationForm):
     header_title = "Login"
     submit_title = "Login"
+    field_order = ['username', 'password']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -33,12 +33,11 @@ class LoginForm(AuthenticationForm):
         model = Profile
         fields = ('username', 'password')
 
-    field_order = ['username', 'password']
-
 
 class ProfileChangeForm(ModelForm):
     header_title = "Settings"
     submit_title = "Save"
+    field_order = ['username', 'email', 'avatar']
 
     class Meta:
         model = Profile
@@ -49,5 +48,3 @@ class ProfileChangeForm(ModelForm):
 
         self.fields['username'].disabled = True
         self.fields['username'].help_text = ""
-
-    field_order = ['username', 'email', 'avatar']
