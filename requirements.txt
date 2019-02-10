@@ -4,3 +4,6 @@ Pillow==5.4.1
 psycopg2-binary==2.7.6.1
 faker==1.0.1
 uwsgi==2.0.17.1
+djangorestframework==3.9.1
+djangorestframework-jwt==1.11.0
+django-rest-swagger==2.2.0

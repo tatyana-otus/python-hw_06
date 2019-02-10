@@ -51,7 +51,6 @@ class ViewTest(TestCase):
     def test_answer_accept(self):
         q = create_question()
         a = create_answer(q)
-        q.answers.add(a)
         client = Client()
         client.login(username=q.author.username,
                      password=default_password)
@@ -70,8 +69,6 @@ class ViewTest(TestCase):
         q = create_question()
         a_1 = create_answer(q)
         a_2 = create_answer(q)
-        q.answers.add(a_1)
-        q.answers.add(a_2)
         client = Client()
         response = client.get(reverse('qa:detail', args=[q.id]))
         self.assertEqual(response.status_code, 200)
@@ -121,7 +118,6 @@ class ViewTest(TestCase):
         a_votes_html = '<h2 id="answer_{}">{}</h2>'
         q = create_question()
         a = create_answer(q)
-        q.answers.add(a)
         votes = 0
         client = Client()
         response = client.get(reverse('qa:detail', args=[q.id]))
@@ -164,7 +160,6 @@ class ViewTest(TestCase):
         q = create_question()
         for index in range(number_of_answers):
             a = create_answer(q)
-            q.answers.add(a)
         client = Client()
         response = client.get(reverse('qa:detail', args=[q.id]))
         self.assertEqual(response.status_code, 200)

@@ -1,5 +1,6 @@
 from os.path import abspath, dirname, join
 from os import getenv
+import datetime
 
 
 DEV_DB_HOST = getenv('HASKER_DB_HOST', 'localhost')
@@ -32,6 +33,9 @@ DEBUG = False
 ALLOWED_HOSTS = ["127.0.0.1"]
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework_swagger',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,6 +47,22 @@ INSTALLED_APPS = [
     'hasker.qa.apps.QaConfig',
     'hasker.users.apps.UsersConfig',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=300)
+}
 
 AUTH_USER_MODEL = 'users.Profile'
 LOGIN_REDIRECT_URL = '/'

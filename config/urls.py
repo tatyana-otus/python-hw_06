@@ -11,6 +11,7 @@ urlpatterns = [
     path('questions/', include('hasker.qa.urls')),
     path('admin/', admin.site.urls),
     path('users/', include('hasker.users.urls')),
+    path('api/', include('hasker.api.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

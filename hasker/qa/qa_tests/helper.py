@@ -59,7 +59,9 @@ def create_question(author=None):
 def create_answer(question, author=None):
     if author is None:
         author = create_user()
-    return Answer.objects.create(author=author,
-                                 body=faker.text()[:100],
-                                 date=datetime.now(pytz.timezone(settings.TIME_ZONE)),
-                                 question=question)
+    a = Answer.objects.create(author=author,
+                              body=faker.text()[:100],
+                              date=datetime.now(pytz.timezone(settings.TIME_ZONE)),
+                              question=question)
+    question.answers.add(a)
+    return a

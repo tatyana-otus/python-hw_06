@@ -209,8 +209,6 @@ class AcceptAnswerTest(TestCase):
         self.question = create_question()
         self.answer_1 = create_answer(self.question)
         self.answer_2 = create_answer(self.question)
-        self.question.answers.add(self.answer_1)
-        self.question.answers.add(self.answer_2)
         self.client = Client(enforce_csrf_checks=True)
         self.client.login(username=self.question.author.username,
                           password=default_password)
@@ -254,14 +252,6 @@ class AcceptAnswerTest(TestCase):
         post_data = {'csrfmiddlewaretoken': self.csrf_token,
                      'id': 1234
                      }
-        response = self.client.post(reverse('qa:accept'), post_data)
-        self.assertEqual(response.content, b'{"status": "FAIL"}')
-        self.assertEqual(self.get_accepted_answer(), None)
-
-    def test_question_author_accept_wrong_answer(self):
-        self.answer_3 = create_answer(self.question)
-        post_data = {'csrfmiddlewaretoken': self.csrf_token,
-                     'id': self.answer_3.id}
         response = self.client.post(reverse('qa:accept'), post_data)
         self.assertEqual(response.content, b'{"status": "FAIL"}')
         self.assertEqual(self.get_accepted_answer(), None)
