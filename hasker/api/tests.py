@@ -1,18 +1,17 @@
-import json
-import pytz
-from datetime import datetime
-from rest_framework.test import APITestCase
-
 from django.utils import timezone
 from django.conf import settings
 from django.test import Client, TestCase
 from django.urls import reverse
 
+import json
+import pytz
+from datetime import datetime
+from rest_framework.test import APITestCase
+
 from hasker.qa.models import Question, Tag, Answer
 from hasker.users.models import Profile
 from hasker.qa.views import IndexView
 from hasker.qa.forms import AddQuestionForm
-
 from hasker.qa.qa_tests.helper import *
 
 

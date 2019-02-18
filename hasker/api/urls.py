@@ -1,7 +1,7 @@
+from django.urls import path
+
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_swagger.views import get_swagger_view
-
-from django.urls import path
 
 from . import views
 
